@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "957990201693",
+    "firebase_url": "https://quqid-a8950-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "quqid-a8950",
+    "storage_bucket": "quqid-a8950.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:957990201693:android:d49b4703925016f34420b4",
+        "android_client_info": {
+          "package_name": "com.QuQ.StraTown"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "957990201693-ito33fgqo6sbgjcabr4ci4fon63cdce4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDP9__Afm8ZRwFvBfs0Kq7VakGegUJjqI4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "957990201693-ito33fgqo6sbgjcabr4ci4fon63cdce4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "957990201693-l6r951rh0vl77fn8srapf40buqt6m8vl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.QuQ.StraTown"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:957990201693:android:13037bc90c1684ca4420b4",
+        "android_client_info": {
+          "package_name": "com.QuQ.YomuCards"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "957990201693-ito33fgqo6sbgjcabr4ci4fon63cdce4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDP9__Afm8ZRwFvBfs0Kq7VakGegUJjqI4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "957990201693-ito33fgqo6sbgjcabr4ci4fon63cdce4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "957990201693-l6r951rh0vl77fn8srapf40buqt6m8vl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.QuQ.StraTown"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
