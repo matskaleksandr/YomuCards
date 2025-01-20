@@ -31,4 +31,18 @@
     <color name="color6">#00FFFF</color> <!-- Голубой -->
     <color name="color7">#FF7F50</color> <!-- Персиковый -->
     <color name="color8">#8A2BE2</color> <!-- Синевато-фиолетовый -->
+
+
+
+    <color name="primary">#6200EE</color>
+    <color name="primaryDark">#3700B3</color>
+    <color name="secondary">#03DAC6</color>
+    <color name="secondaryDark">#018786</color>
+
+    <!-- Фон и текст -->
+    <color name="background">#F5F5F5</color>
+
+
+    <!-- Ошибки -->
+    <color name="red">#B00020</color>
 </resources>

@@ -1,6 +1,8 @@
 package com.QuQ.yomucards
 
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -22,11 +24,35 @@ import java.io.InputStream
 import java.net.URL
 import java.net.HttpURLConnection
 import android.util.Log
+import androidx.core.view.ViewCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.io.*
+import android.view.MenuItem
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
+import androidx.appcompat.app.AppCompatActivity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Spinner
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.POST
+import retrofit2.http.Query
+import retrofit2.http.Body
+import retrofit2.http.Headers
+import retrofit2.*
+
+
+
 
 
 class MainActivity : ComponentActivity() {
@@ -172,7 +198,7 @@ class MainActivity : ComponentActivity() {
 
 
 
-class HomeActivity : ComponentActivity() {
+class HomeActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private val downloadUrl = "https://firebasestorage.googleapis.com/v0/b/quqid-a8950.appspot.com/o/YomoCards%2Ftext.txt?alt=media&token=cb3618c6-cfba-48a8-a855-7dc6ffb06c7f"
     private val fileName = "test.txt"
@@ -180,6 +206,36 @@ class HomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+
+        val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
+
+        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> {
+                    // Переход к фрагменту "Поиск"
+                    showFragment(SearchFragment())
+                    true
+                }
+
+                R.id.nav_search -> {
+                    // Переход к фрагменту "Уроки"
+                    showFragment(LessonsFragment())
+                    true
+                }
+
+                R.id.nav_profile -> {
+                    // Переход к фрагменту "Переводчик"
+                    showFragment(TranslatorFragment())
+                    true
+                }
+
+                else -> false
+            }
+        }
+        if (savedInstanceState == null) {
+            showFragment(SearchFragment())
+        }
+
 
         auth = FirebaseAuth.getInstance()
         val signOutButton = findViewById<Button>(R.id.signOutButton)
@@ -197,6 +253,14 @@ class HomeActivity : ComponentActivity() {
                 startActivity(Intent(this, MainActivity::class.java))
             }
         }
+    }
+
+    private fun showFragment(fragment: Fragment) {
+        // Меняем текущий фрагмент
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragment_container, fragment)
+        transaction.addToBackStack(null) // Если нужно, добавляем в стек
+        transaction.commit()
     }
 
     private fun downloadFile(url: String, fileName: String) {
@@ -298,3 +362,105 @@ class HomeActivity : ComponentActivity() {
         }
     }
 }
+
+
+class SearchFragment : Fragment(R.layout.fragment_search) {
+    // Здесь можно разместить логику для отображения "Поиск"
+}
+
+class LessonsFragment : Fragment(R.layout.fragment_lessons) {
+    // Логика для отображения "Уроки"
+}
+
+class TranslatorFragment : Fragment(R.layout.fragment_translator) {
+    private val API_KEY = "AQVNx-dxDf5tCG4dLEZpV7mNk6lOq89Zj8OlY3eb"  // Замени на свой API-ключ
+    private val FOLDER_ID = "aje7stogrvjd11n1qb26"  // Замени на ID каталога в Yandex Cloud
+    private val BASE_URL = "https://translate.api.cloud.yandex.net/translate/v2/"
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_translator, container, false)
+    }
+
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val btn_translate = view.findViewById<Button>(R.id.btn_translate)
+        val etSourceText = view.findViewById<EditText>(R.id.edt_input)
+        val btnSwap = view.findViewById<Button>(R.id.btn_swap)
+        val etTranslatedText = view.findViewById<TextView>(R.id.txt_output)
+
+        btn_translate?.setOnClickListener {
+            val textToTranslate = etSourceText.text.toString()
+            if (textToTranslate.isNotEmpty()) {
+                translateText(textToTranslate, "ru", "ja")
+            } else {
+                showToast(requireContext(), "Введите текст")
+            }
+        }
+
+        btnSwap.setOnClickListener {
+            val temp = etSourceText.text.toString()
+            etSourceText.setText(etTranslatedText.text.toString())
+            etTranslatedText.setText(temp)
+        }
+    }
+
+    private fun translateText(text: String, sourceLang: String, targetLang: String) {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val service = retrofit.create(YandexTranslateService::class.java)
+
+        val request = YandexTranslateRequest(
+            folderId = FOLDER_ID,
+            texts = listOf(text),
+            targetLanguageCode = targetLang
+        )
+
+        service.translateText(request).enqueue(object : Callback<YandexTranslateResponse> {
+            override fun onResponse(call: Call<YandexTranslateResponse>, response: Response<YandexTranslateResponse>) {
+                if (response.isSuccessful) {
+                    val translatedText = response.body()?.translations?.firstOrNull()?.text
+
+                } else {
+                    showToast(requireContext(), "Ошибка: ${response.errorBody()?.string()}")
+                }
+            }
+
+            override fun onFailure(call: Call<YandexTranslateResponse>, t: Throwable) {
+                showToast(requireContext(), "Ошибка соединения: ${t.message}")
+            }
+        })
+    }
+
+    private fun showToast(context: Context, message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+}
+
+interface YandexTranslateService {
+    @Headers("Content-Type: application/json")
+    @POST("translate")
+    fun translateText(@Body request: YandexTranslateRequest): Call<YandexTranslateResponse>
+}
+
+data class YandexTranslateRequest(
+    val folderId: String,
+    val texts: List<String>,
+    val targetLanguageCode: String
+)
+
+data class YandexTranslateResponse(
+    val translations: List<Translation>
+)
+
+data class Translation(
+    val text: String
+)
+
