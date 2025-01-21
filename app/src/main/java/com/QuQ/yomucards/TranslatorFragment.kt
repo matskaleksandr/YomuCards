@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -41,22 +43,66 @@ class TranslatorFragment : Fragment(R.layout.fragment_translator) {
         val btnSwap = view.findViewById<Button>(R.id.btn_swap)
         val etTranslatedText = view.findViewById<TextView>(R.id.txt_output)
 
+        val spinner_to =  view.findViewById<Spinner>(R.id.spinner_to)
+        val spinner_from =  view.findViewById<Spinner>(R.id.spinner_from)
+
         btnTranslate.setOnClickListener {
             val textToTranslate = etSourceText.text.toString()
             if (textToTranslate.isNotEmpty()) {
-                translateText(textToTranslate, "ru", "ja") { translatedText ->
+                translateText(textToTranslate, spinner_from.selectedItem.toString(), spinner_to.selectedItem.toString()) { translatedText ->
                     etTranslatedText.text = translatedText
                 }
             } else {
                 showToast(requireContext(), "Введите текст")
             }
         }
-
         btnSwap.setOnClickListener {
-            val temp = etSourceText.text.toString()
+            // Получаем текущие адаптеры спиннеров
+            val adapterFrom = spinner_from.adapter as ArrayAdapter<String>
+            val adapterTo = spinner_to.adapter as ArrayAdapter<String>
+
+            // Получаем массивы значений
+            val fromArray = resources.getStringArray(R.array.languages1)
+            val toArray = resources.getStringArray(R.array.languages2)
+
+            val firstItemText = spinner_from.getItemAtPosition(0).toString()
+            if(firstItemText != "ja"){
+                // Сохраняем текущие выбранные позиции
+                val selectedFrom = spinner_from.selectedItemPosition
+                val selectedTo = spinner_to.selectedItemPosition
+
+                // Меняем адаптеры местами
+                spinner_from.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, toArray)
+                spinner_to.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, fromArray)
+
+                // После изменения адаптеров восстанавливаем выбранные элементы
+                spinner_from.setSelection(selectedTo)
+                spinner_to.setSelection(selectedFrom)
+            }
+            else{
+                // Сохраняем текущие выбранные позиции
+                val selectedFrom = spinner_from.selectedItemPosition
+                val selectedTo = spinner_to.selectedItemPosition
+
+                // Меняем адаптеры местами
+                spinner_from.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, fromArray)
+                spinner_to.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, toArray)
+
+                // После изменения адаптеров восстанавливаем выбранные элементы
+                spinner_from.setSelection(selectedTo)
+                spinner_to.setSelection(selectedFrom)
+            }
+
+
+
+            // Обмен текстами полей
+            val tempText = etSourceText.text.toString()
             etSourceText.setText(etTranslatedText.text.toString())
-            etTranslatedText.setText(temp)
+            etTranslatedText.setText(tempText)
         }
+
+
+
     }
 
     private fun translateText(text: String, sourceLang: String, targetLang: String, callback: (String) -> Unit) {

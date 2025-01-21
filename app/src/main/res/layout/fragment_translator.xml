@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:layout_gravity="center"
     android:padding="16dp">
 
     <!-- Кнопки для выбора и смены языка -->
@@ -17,7 +18,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:entries="@array/languages" />
+            android:entries="@array/languages1" />
 
         <Button
             android:id="@+id/btn_swap"
@@ -30,30 +31,40 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:entries="@array/languages" />
+            android:entries="@array/languages2" />
     </LinearLayout>
 
     <!-- Поле для ввода текста -->
     <EditText
         android:id="@+id/edt_input"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="172dp"
+        android:ellipsize="end"
         android:hint="Введите текст"
-        android:inputType="text" />
+        android:inputType="textMultiLine"
+        android:scrollbars="vertical"
+        android:gravity="top|start"
+        android:scrollHorizontally="false"
+        android:background="@android:color/transparent"/> <!-- Запрещает горизонтальную прокрутку -->
+
 
     <!-- Кнопка для перевода -->
+
+    <!-- Поле для вывода переведённого текста -->
     <Button
         android:id="@+id/btn_translate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:text="Перевести" />
 
-    <!-- Поле для вывода переведённого текста -->
     <TextView
         android:id="@+id/txt_output"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:paddingTop="16dp" />
+        android:layout_height="184dp"
+        android:ellipsize="end"
+        android:paddingTop="16dp"
+        android:scrollbars="vertical"
+        android:text="" />
 
 </LinearLayout>

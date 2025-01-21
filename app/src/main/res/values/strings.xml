@@ -2,8 +2,15 @@
     <string name="app_name">YomuCards</string>
     <string name="default_web_client_id">957990201693-ito33fgqo6sbgjcabr4ci4fon63cdce4.apps.googleusercontent.com</string>
     <string name="email">Email</string>
-    <string-array name="languages">
+    <string-array name="languages1">
         <item>ru</item> <!-- Русский -->
+        <item>en</item>
+        <item>fr</item>
+        <item>de</item>
+        <item>es</item>
+    </string-array>
+
+    <string-array name="languages2">
         <item>ja</item> <!-- Японский -->
     </string-array>
 </resources>
