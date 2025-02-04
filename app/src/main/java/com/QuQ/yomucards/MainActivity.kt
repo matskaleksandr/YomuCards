@@ -187,14 +187,22 @@ class MainActivity : ComponentActivity() {
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
-    private val downloadUrl = "https://firebasestorage.googleapis.com/v0/b/quqid-a8950.appspot.com/o/YomoCards%2Ftext.txt?alt=media&token=cb3618c6-cfba-48a8-a855-7dc6ffb06c7f"
-    private val fileName = "test.txt"
+    private val downloadUrl = "https://firebasestorage.googleapis.com/v0/b/quqid-a8950.appspot.com/o/YomoCards%2Fyomucardsdb.db?alt=media&token=2482566d-3c4a-4abd-aa07-64d8b16d2bfb"
+    private val fileName = "yomucardsdb.db"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
+
+        val file = File(filesDir, fileName)
+        if(file.exists()){
+
+        }
+        else{
+            downloadFile(downloadUrl, fileName)
+        }
 
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
@@ -248,6 +256,7 @@ class HomeActivity : AppCompatActivity() {
         transaction.replace(R.id.fragment_container, fragment)
         transaction.addToBackStack(null) // Если нужно, добавляем в стек
         transaction.commit()
+
     }
 
     private fun downloadFile(url: String, fileName: String) {
@@ -261,7 +270,6 @@ class HomeActivity : AppCompatActivity() {
 
                 if (result) {
                     Toast.makeText(this@HomeActivity, "Загрузка завершена!", Toast.LENGTH_SHORT).show()
-                    readFileAndDisplayContent(fileName)
                 } else {
                     Toast.makeText(this@HomeActivity, "Ошибка загрузки.", Toast.LENGTH_SHORT).show()
                 }
@@ -330,30 +338,10 @@ class HomeActivity : AppCompatActivity() {
             return false
         }
     }
-
-    private fun readFileAndDisplayContent(fileName: String) {
-        try {
-            val file = File(filesDir, fileName)
-
-            if (file.exists()) {
-                val content = file.readText(Charsets.UTF_8)
-                Log.d("FileContent", "Содержимое файла:\n$content")
-                Toast.makeText(this, "Файл прочитан успешно!", Toast.LENGTH_SHORT).show()
-            } else {
-                Log.e("FileContent", "Файл не найден!")
-                Toast.makeText(this, "Файл не найден!", Toast.LENGTH_SHORT).show()
-            }
-        } catch (e: IOException) {
-            Log.e("FileContent", "Ошибка чтения файла: ${e.message}")
-            Toast.makeText(this, "Ошибка чтения файла!", Toast.LENGTH_SHORT).show()
-        }
-    }
 }
 
 
-class SearchFragment : Fragment(R.layout.fragment_search) {
-    // Здесь можно разместить логику для отображения "Поиск"
-}
+
 
 class LessonsFragment : Fragment(R.layout.fragment_lessons) {
     // Логика для отображения "Уроки"
