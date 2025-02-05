@@ -36,10 +36,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.appcompat.app.AppCompatActivity
-
-
-
-
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 
 class MainActivity : ComponentActivity() {
@@ -189,6 +189,8 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private val downloadUrl = "https://firebasestorage.googleapis.com/v0/b/quqid-a8950.appspot.com/o/YomoCards%2Fyomucardsdb.db?alt=media&token=2482566d-3c4a-4abd-aa07-64d8b16d2bfb"
     private val fileName = "yomucardsdb.db"
+    private lateinit var databaseHelper: DatabaseHelper
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -198,7 +200,31 @@ class HomeActivity : AppCompatActivity() {
 
         val file = File(filesDir, fileName)
         if(file.exists()){
+            databaseHelper = DatabaseHelper(applicationContext, fileName)
 
+            val databaseRef = FirebaseDatabase.getInstance().getReference("Versions").child("YomuCardsDB")
+
+            databaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    // Пробуем получить значение как Int
+                    val value = snapshot.getValue(Int::class.java)
+                    if (value != null) {
+                        Log.d("FirebaseValue", "Полученное значение: $value")
+                        if(value != databaseHelper.getVersionDB()){
+                            file.delete()
+                            downloadFile(downloadUrl, fileName)
+                        }
+                        // Здесь можно использовать значение, например:
+                        // val version = value
+                    } else {
+                        Log.w("FirebaseValue", "Значение не найдено или имеет неверный формат")
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("FirebaseValue", "Ошибка при получении данных: ${error.message}")
+                }
+            })
         }
         else{
             downloadFile(downloadUrl, fileName)
