@@ -1,15 +1,25 @@
 package com.QuQ.yomucards
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.res.Configuration
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.graphics.Color
+import android.graphics.Rect
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.text.Html
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.LinearLayout
 import androidx.appcompat.widget.SearchView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -29,6 +39,10 @@ class SearchFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: KanaAdapter
     private lateinit var databaseHelper: DatabaseHelper
+
+    private lateinit var infoButton: ImageButton
+    private lateinit var infoText: TextView
+
     // Изменяемый список, который передаём адаптеру
     private val kanaList = mutableListOf<Kana>()
 
@@ -40,6 +54,36 @@ class SearchFragment : Fragment() {
 
         recyclerView = view.findViewById(R.id.recycler_view)
 
+        infoButton = view.findViewById(R.id.info_button)
+        infoText = view.findViewById(R.id.info_text)
+        infoText.visibility = View.GONE
+        infoButton.setOnClickListener {
+            showInfoText()
+        }
+
+        // Устанавливаем обработчик клика по экрану для скрытия текста
+        view.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                hideInfoText()  // Скрыть текст при клике на любом месте
+            }
+            // Перехватываем события касания для RecyclerView, чтобы они не мешали обработке
+            if (v is RecyclerView) {
+                v.requestDisallowInterceptTouchEvent(true)
+            }
+            false
+        }
+        recyclerView.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                // Проверяем, был ли клик по элементу RecyclerView
+                val childView = recyclerView.findChildViewUnder(event.x, event.y)
+                if (childView == null) {
+                    // Если клик был по пустой области RecyclerView, скрываем текст
+                    hideInfoText()
+                }
+            }
+            false // Возвращаем false, чтобы другие события могли быть обработаны RecyclerView
+        }
+
         // Инициализация SearchView из разметки
         val searchView = view.findViewById<SearchView>(R.id.search_view)
 
@@ -48,7 +92,9 @@ class SearchFragment : Fragment() {
         recyclerView.layoutManager = GridLayoutManager(requireContext(), spanCount)
 
         // Передаём изменяемый список адаптеру
-        adapter = KanaAdapter(kanaList)
+        adapter = KanaAdapter(kanaList){
+            hideInfoText() // Вызываем hideInfoText при клике на элемент
+        }
         recyclerView.adapter = adapter
 
         // Загружаем первоначальные данные (без фильтра, или можно задать пустой запрос)
@@ -73,6 +119,43 @@ class SearchFragment : Fragment() {
 
         return view
     }
+
+    private fun showInfoText() {
+        // Показать текст с анимацией
+        infoText.visibility = View.VISIBLE
+
+
+        val text = """
+        <font color="#0000FF">あ</font> – хирагана <br>
+        <font color="#00FF00">カ</font> – катакана <br>
+        <font color="#000000">漢</font> – кандзи
+        """
+        infoText.text = Html.fromHtml(text)
+
+
+
+        // Настройка анимации для появления
+        val fadeIn = ObjectAnimator.ofFloat(infoText, "alpha", 0f, 1f)
+        fadeIn.duration = 500
+        fadeIn.start()
+    }
+
+    private fun hideInfoText() {
+        // Скрыть текст с анимацией
+        val fadeOut = ObjectAnimator.ofFloat(infoText, "alpha", 1f, 0f)
+        fadeOut.duration = 500
+
+        // Запускаем анимацию
+        fadeOut.start()
+
+        // После окончания анимации скрываем текст с небольшой задержкой
+        Handler(Looper.getMainLooper()).postDelayed({
+            infoText.visibility = View.GONE
+        }, fadeOut.duration)  // Задержка равна продолжительности анимации
+    }
+
+
+
 
     override fun onResume() {
         super.onResume()
@@ -104,7 +187,7 @@ class SearchFragment : Fragment() {
     }
 }
 
-class KanaAdapter(private val kanaList: MutableList<Kana>) :
+class KanaAdapter(private val kanaList: MutableList<Kana> , private val onItemClick: () -> Unit) :
     RecyclerView.Adapter<KanaAdapter.KanaViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): KanaViewHolder {
@@ -117,6 +200,7 @@ class KanaAdapter(private val kanaList: MutableList<Kana>) :
         val kana = kanaList[position]
         holder.kanaSymbol.text = kana.symbol
         holder.kanaPronunciation.text = kana.pronunciation
+        holder.bind(kana)
 
         // Устанавливаем цвет текста в зависимости от типа
         when (kana.type) {
@@ -127,9 +211,17 @@ class KanaAdapter(private val kanaList: MutableList<Kana>) :
 
     override fun getItemCount(): Int = kanaList.size
 
-    class KanaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class KanaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val kanaSymbol: TextView = itemView.findViewById(R.id.kana_symbol)
         val kanaPronunciation: TextView = itemView.findViewById(R.id.kana_pronunciation)
+
+        fun bind(kana: Kana) {
+            kanaSymbol.text = kana.symbol
+            itemView.setOnClickListener {
+                onItemClick() // Вызов метода, переданного из фрагмента
+                Log.d("Click", "++++")
+            }
+        }
     }
 }
 

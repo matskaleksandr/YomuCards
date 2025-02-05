@@ -5,6 +5,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Кнопка с информацией -->
+    <ImageButton
+        android:id="@+id/info_button"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="15dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="Info button"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_info"
+        app:layout_constraintBottom_toBottomOf="@+id/search_view"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints,TouchTargetSizeCheck" />
+
+    <!-- Текст с прямоугольником -->
+
+    <!-- Поиск -->
+
+
+
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search_view"
         android:layout_width="match_parent"
@@ -19,17 +40,35 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="MissingConstraints" />
 
+    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
         android:layout_marginTop="72dp"
         android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
         app:layout_goneMarginBottom="100dp" />
-</androidx.constraintlayout.widget.ConstraintLayout>
 
+    <TextView
+        android:id="@+id/info_text"
+        android:layout_width="279dp"
+        android:layout_height="124dp"
+        android:layout_alignTop="@id/info_button"
+        android:layout_alignEnd="@id/info_button"
+        android:layout_alignBottom="@id/info_button"
+        android:background="@drawable/info_bg_1"
+        android:padding="10dp"
+        android:text="Это информационное сообщение."
+        android:textColor="#4E342E"
+        android:textSize="22sp"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="40dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
