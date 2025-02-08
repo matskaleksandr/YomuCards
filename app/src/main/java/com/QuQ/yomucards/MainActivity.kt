@@ -184,7 +184,7 @@ class MainActivity : ComponentActivity() {
                         User.name = user.email.toString()
                         FirebaseDatabase.getInstance().getReference("Users")
                             .child(uid)
-                            .setValue(userData)
+                            .updateChildren(userData)
                             .addOnCompleteListener { dbTask ->
                                 if (!dbTask.isSuccessful) {
                                     dbTask.exception?.printStackTrace()
@@ -251,26 +251,54 @@ class MainActivity : ComponentActivity() {
                             // Пример URL для аватара
                             val avatarPath = "https://yt3.ggpht.com/a/AATXAJzdmRM10P6trPdRbMeGM7BVbYUMdhbgtWqiUw=s900-c-k-c0xffffffff-no-rj-mo"
                             if (uid != null) {
-                                val userData = mapOf(
-                                    "Username" to account.displayName,
-                                    "Email" to account.email,
-                                    "AvatarPath" to avatarPath,
-                                    "Id" to uid,
-                                    "BackgroundNumber" to 0
-                                )
+                                // Обновляем глобальный объект User
                                 User.id = uid
                                 User.name = account.displayName.toString()
-                                FirebaseDatabase.getInstance().getReference("Users")
-                                    .child(uid)
-                                    .setValue(userData)
-                                    .addOnCompleteListener { dbTask ->
-                                        if (dbTask.isSuccessful) {
-                                            navigateToHome()
-                                            Toast.makeText(this, "Вход через Google выполнен!", Toast.LENGTH_SHORT).show()
-                                        } else {
-                                            Toast.makeText(this, "Ошибка при записи данных: ${dbTask.exception?.message}", Toast.LENGTH_SHORT).show()
-                                        }
+
+                                val userRef = FirebaseDatabase.getInstance().getReference("Users").child(uid)
+
+                                // Сначала считываем текущие данные
+                                userRef.get().addOnSuccessListener { snapshot ->
+                                    val updates = mutableMapOf<String, Any>()
+                                    // Если поле Username не существует и displayName не null — добавляем его
+                                    if (!snapshot.hasChild("Username") && account.displayName != null) {
+                                        updates["Username"] = account.displayName!!
                                     }
+                                    // Аналогично для Email
+                                    if (!snapshot.hasChild("Email") && account.email != null) {
+                                        updates["Email"] = account.email!!
+                                    }
+                                    // Если AvatarPath отсутствует — добавляем URL аватара
+                                    if (!snapshot.hasChild("AvatarPath")) {
+                                        updates["AvatarPath"] = avatarPath
+                                    }
+                                    // Если поле Id отсутствует — добавляем UID
+                                    if (!snapshot.hasChild("Id")) {
+                                        updates["Id"] = uid
+                                    }
+                                    // Если поле BackgroundNumber отсутствует — устанавливаем значение 0
+                                    if (!snapshot.hasChild("BackgroundNumber")) {
+                                        updates["BackgroundNumber"] = 0
+                                    }
+
+                                    if (updates.isNotEmpty()) {
+                                        userRef.updateChildren(updates)
+                                            .addOnCompleteListener { dbTask ->
+                                                if (dbTask.isSuccessful) {
+                                                    navigateToHome()
+                                                    Toast.makeText(this, "Вход через Google выполнен!", Toast.LENGTH_SHORT).show()
+                                                } else {
+                                                    Toast.makeText(this, "Ошибка при записи данных: ${dbTask.exception?.message}", Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
+                                    } else {
+                                        // Если обновлять нечего — просто переходим на HomeActivity
+                                        navigateToHome()
+                                        Toast.makeText(this, "Вход через Google выполнен!", Toast.LENGTH_SHORT).show()
+                                    }
+                                }.addOnFailureListener { error ->
+                                    Toast.makeText(this, "Ошибка при чтении данных: ${error.message}", Toast.LENGTH_SHORT).show()
+                                }
                             } else {
                                 navigateToHome()
                                 Toast.makeText(this, "Вход через Google выполнен!", Toast.LENGTH_SHORT).show()
@@ -282,6 +310,8 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+
 
     private fun navigateToHome() {
         val intent = Intent(this, HomeActivity::class.java)
