@@ -10,6 +10,16 @@
         android:icon="@drawable/ic_yo" />
 
     <item
+        android:id="@+id/nav_cards"
+        android:title="Мои карточки"
+        android:icon="@drawable/ic_yo" />
+
+    <item
+        android:id="@+id/nav_Tren"
+        android:title="Повторение выученного"
+        android:icon="@drawable/ic_yo" />
+
+    <item
         android:id="@+id/nav_settings"
         android:title="Настройки"
         android:icon="@drawable/ic_yo" />
