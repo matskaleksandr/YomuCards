@@ -4,8 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="8dp">
+    android:layout_height="match_parent">
 
     <FrameLayout
         android:id="@+id/fragment_container"
@@ -46,12 +45,12 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
-        android:layout_width="379dp"
-        android:layout_height="86dp"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
         app:itemIconTint="@null"
         app:itemRippleColor="@android:color/transparent"
         android:background="?android:attr/windowBackground"
-        app:itemIconSize="70dp"
+        app:itemIconSize="60dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

@@ -1,5 +1,6 @@
 package com.QuQ.yomucards
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -36,11 +37,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
+object User {
+    var id: String = "-1"
+    var name: String = "name"
+}
 
 class MainActivity : ComponentActivity() {
 
@@ -53,23 +59,20 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //Найти элементы интерфейса
-
-
-
+        // Устанавливаем макет
         setContentView(R.layout.activity_main)
 
+        // Инициализируем элементы интерфейса
         val registerButton = findViewById<Button>(R.id.registerButton)
         val signInButton = findViewById<Button>(R.id.signInButton)
         val googleSignInButton = findViewById<Button>(R.id.googleSignInButton)
         val emailEditText = findViewById<EditText>(R.id.emailEditText)
         val passwordEditText = findViewById<EditText>(R.id.passwordEditText)
-
         val headerText: TextView = findViewById(R.id.headerText)
+
+        // Пример раскраски заголовка с помощью SpannableString
         val text = "YomuCards"
         val spannableString = SpannableString(text)
-
-// Применяем разные цвета к каждой букве
         spannableString.setSpan(ForegroundColorSpan(ContextCompat.getColor(this, R.color.color7)), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)  // 1-я буква
         spannableString.setSpan(ForegroundColorSpan(ContextCompat.getColor(this, R.color.color7)), 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)  // 2-я буква
         spannableString.setSpan(ForegroundColorSpan(ContextCompat.getColor(this, R.color.color3)), 2, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)  // 3-я буква
@@ -79,10 +82,10 @@ class MainActivity : ComponentActivity() {
         spannableString.setSpan(ForegroundColorSpan(ContextCompat.getColor(this, R.color.color8)), 6, 7, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)  // 7-я буква
         spannableString.setSpan(ForegroundColorSpan(ContextCompat.getColor(this, R.color.color8)), 7, 8, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)  // 8-я буква
         spannableString.setSpan(ForegroundColorSpan(ContextCompat.getColor(this, R.color.color8)), 8, 9, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)  // 9-я буква
-
-
+        // ... задаём остальные цвета букв по аналогии ...
         headerText.text = spannableString
 
+        // Инициализация FirebaseAuth
         auth = FirebaseAuth.getInstance()
 
         // Настройка Google Sign-In
@@ -92,21 +95,21 @@ class MainActivity : ComponentActivity() {
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-        // Регистрация
+        // Обработчик кнопки регистрации
         registerButton.setOnClickListener {
             val email = emailEditText.text.toString()
             val password = passwordEditText.text.toString()
             registerUser(email, password)
         }
 
-        // Вход
+        // Обработчик кнопки входа по email
         signInButton.setOnClickListener {
             val email = emailEditText.text.toString()
             val password = passwordEditText.text.toString()
             signInUser(email, password)
         }
 
-        // Вход через Google
+        // Обработчик кнопки входа через Google
         googleSignInButton.setOnClickListener {
             signInWithGoogle()
         }
@@ -114,21 +117,80 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            navigateToHome()
+        // При каждом запуске проверяем сохранённые данные входа
+        val prefs = getSharedPreferences("loginPrefs", Context.MODE_PRIVATE)
+        val loginType = prefs.getString("loginType", null)
+        if (loginType != null) {
+            // Чтобы выполнить повторный вход, сначала выходим
+            auth.signOut()
+            when (loginType) {
+                "email" -> {
+                    val storedEmail = prefs.getString("email", "")
+                    val storedPassword = prefs.getString("password", "")
+                    if (!storedEmail.isNullOrEmpty() && !storedPassword.isNullOrEmpty()) {
+                        // Выполняем вход по email и паролю
+                        signInUser(storedEmail, storedPassword)
+                    }
+                }
+                "google" -> {
+                    // Запускаем вход через Google
+                    signInWithGoogle()
+                }
+            }
+        }
+    }
+
+    // Функция для сохранения данных входа
+    private fun storeLoginInfo(loginType: String, email: String? = null, password: String? = null) {
+        val prefs = getSharedPreferences("loginPrefs", Context.MODE_PRIVATE)
+        prefs.edit().apply {
+            putString("loginType", loginType)
+            if (loginType == "email") {
+                putString("email", email)
+                putString("password", password)
+            }
+            apply()
         }
     }
 
     private fun registerUser(email: String, password: String) {
-        if(email == "" || password == ""){
-            return
-        }
+        if (email.isEmpty() || password.isEmpty()) return
+
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
+                    // Сохраняем тип входа (email) и данные
+                    storeLoginInfo("email", email, password)
+
+                    // Переход в домашнюю активность
                     navigateToHome()
                     Toast.makeText(this, "Регистрация успешна!", Toast.LENGTH_SHORT).show()
+
+                    val user = auth.currentUser
+                    val uid = user?.uid
+                    val nickname = user?.email
+                    // Пример URL для аватара
+                    val avatarPath = "https://yt3.ggpht.com/a/AATXAJzdmRM10P6trPdRbMeGM7BVbYUMdhbgtWqiUw=s900-c-k-c0xffffffff-no-rj-mo"
+                    if (uid != null) {
+                        val userData = mapOf(
+                            "Username" to nickname,
+                            "Email" to email,
+                            "AvatarPath" to avatarPath,
+                            "Id" to uid,
+                            "BackgroundNumber" to 0
+                        )
+                        // Обновляем глобальный объект User (предполагается, что он создан как object User)
+                        User.id = uid
+                        User.name = user.email.toString()
+                        FirebaseDatabase.getInstance().getReference("Users")
+                            .child(uid)
+                            .setValue(userData)
+                            .addOnCompleteListener { dbTask ->
+                                if (!dbTask.isSuccessful) {
+                                    dbTask.exception?.printStackTrace()
+                                }
+                            }
+                    }
                 } else {
                     Toast.makeText(this, "Ошибка: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
@@ -136,14 +198,31 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun signInUser(email: String, password: String) {
-        if(email == "" || password == ""){
-            return
-        }
+        if (email.isEmpty() || password.isEmpty()) return
+
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    navigateToHome()
-                    Toast.makeText(this, "Вход выполнен!", Toast.LENGTH_SHORT).show()
+                    // Сохраняем тип входа (email) и данные
+                    storeLoginInfo("email", email, password)
+                    val uid = auth.currentUser?.uid
+                    if (uid != null) {
+                        val databaseRef = FirebaseDatabase.getInstance().getReference("Users").child(uid)
+                        databaseRef.get().addOnSuccessListener { snapshot ->
+                            if (snapshot.exists()) {
+                                User.id = uid
+                                User.name = snapshot.child("Username").getValue(String::class.java).orEmpty()
+                                navigateToHome()
+                                Toast.makeText(this, "Вход выполнен!", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(this, "Ошибка: данные пользователя не найдены", Toast.LENGTH_SHORT).show()
+                            }
+                        }.addOnFailureListener {
+                            Toast.makeText(this, "Ошибка загрузки данных", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        Toast.makeText(this, "Ошибка: не найден UID", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
                     Toast.makeText(this, "Ошибка: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
@@ -165,8 +244,37 @@ class MainActivity : ComponentActivity() {
                 auth.signInWithCredential(credential)
                     .addOnCompleteListener(this) { authTask ->
                         if (authTask.isSuccessful) {
-                            navigateToHome()
-                            Toast.makeText(this, "Вход через Google выполнен!", Toast.LENGTH_SHORT).show()
+                            // Сохраняем тип входа (google)
+                            storeLoginInfo("google")
+                            val user = auth.currentUser
+                            val uid = user?.uid
+                            // Пример URL для аватара
+                            val avatarPath = "https://yt3.ggpht.com/a/AATXAJzdmRM10P6trPdRbMeGM7BVbYUMdhbgtWqiUw=s900-c-k-c0xffffffff-no-rj-mo"
+                            if (uid != null) {
+                                val userData = mapOf(
+                                    "Username" to account.displayName,
+                                    "Email" to account.email,
+                                    "AvatarPath" to avatarPath,
+                                    "Id" to uid,
+                                    "BackgroundNumber" to 0
+                                )
+                                User.id = uid
+                                User.name = account.displayName.toString()
+                                FirebaseDatabase.getInstance().getReference("Users")
+                                    .child(uid)
+                                    .setValue(userData)
+                                    .addOnCompleteListener { dbTask ->
+                                        if (dbTask.isSuccessful) {
+                                            navigateToHome()
+                                            Toast.makeText(this, "Вход через Google выполнен!", Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            Toast.makeText(this, "Ошибка при записи данных: ${dbTask.exception?.message}", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                            } else {
+                                navigateToHome()
+                                Toast.makeText(this, "Вход через Google выполнен!", Toast.LENGTH_SHORT).show()
+                            }
                         } else {
                             Toast.makeText(this, "Ошибка: ${authTask.exception?.message}", Toast.LENGTH_SHORT).show()
                         }
@@ -185,6 +293,7 @@ class MainActivity : ComponentActivity() {
 
 
 
+
 class HomeActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private val downloadUrl = "https://firebasestorage.googleapis.com/v0/b/quqid-a8950.appspot.com/o/YomoCards%2Fyomucardsdb.db?alt=media&token=2482566d-3c4a-4abd-aa07-64d8b16d2bfb"
@@ -192,6 +301,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var databaseHelper: DatabaseHelper
 
 
+    @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -254,8 +364,11 @@ class HomeActivity : AppCompatActivity() {
             }
         }
         if (savedInstanceState == null) {
-            showFragment(SearchFragment())
+            bottomNavigationView.selectedItemId = R.id.nav_search
+            //showFragment(LessonsFragment())
+
         }
+
 
 
         auth = FirebaseAuth.getInstance()
@@ -369,7 +482,4 @@ class HomeActivity : AppCompatActivity() {
 
 
 
-class LessonsFragment : Fragment(R.layout.fragment_lessons) {
-    // Логика для отображения "Уроки"
-}
 

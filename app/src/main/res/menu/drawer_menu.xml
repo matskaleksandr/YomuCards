@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_home"
+        android:title="Профиль"
+        android:icon="@drawable/ic_yo" />
+    <item
+        android:id="@+id/nav_friends"
+        android:title="Друзья"
+        android:icon="@drawable/ic_yo" />
+
+    <item
+        android:id="@+id/nav_settings"
+        android:title="Настройки"
+        android:icon="@drawable/ic_yo" />
+    <!-- Добавьте дополнительные пункты по необходимости -->
+</menu>

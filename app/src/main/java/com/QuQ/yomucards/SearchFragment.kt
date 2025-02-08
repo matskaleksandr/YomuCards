@@ -277,10 +277,10 @@ class DatabaseHelper(context: Context, fileName: String) : SQLiteOpenHelper(
             val likeQueryKana = "%$query%"
             val likeQueryTranscription = "$query%"
             db.rawQuery(
-                "SELECT Hiragana.kana, Hiragana.ENtranscription FROM Hiragana WHERE Hiragana.kana LIKE ? OR Hiragana.ENtranscription LIKE ? " +
+                "SELECT Hiragana.kana, Hiragana.ENtranscription FROM Hiragana WHERE Hiragana.kana LIKE ? OR Hiragana.ENtranscription LIKE ? OR Hiragana.RUtranscription LIKE ? " +
                         "UNION " +
-                        "SELECT Katakana.kana, Katakana.ENtranscription FROM Katakana WHERE Katakana.kana LIKE ? OR Katakana.ENtranscription LIKE ?",
-                arrayOf("$query%", "$query%", "$query%", "$query%")
+                        "SELECT Katakana.kana, Katakana.ENtranscription FROM Katakana WHERE Katakana.kana LIKE ? OR Katakana.ENtranscription LIKE ? OR Katakana.RUtranscription LIKE ?",
+                arrayOf("$query%", "$query%", "$query%", "$query%", "$query%", "$query%")
             )
         }
 
