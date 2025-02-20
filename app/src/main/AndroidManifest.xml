@@ -36,6 +36,17 @@
                 android:resource="@xml/widget_info"/>
         </receiver>
 
+        <activity android:name=".ProfileActivity"
+            android:exported="true"
+            android:theme="@style/Theme.YomuCards"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </activity>
+
+
+
         <activity
             android:name=".SplashActivity"
             android:exported="true"

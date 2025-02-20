@@ -3,6 +3,7 @@ package com.QuQ.yomucards
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -46,6 +47,8 @@ import com.google.firebase.database.ValueEventListener
 object User {
     var id: String = "-1"
     var name: String = "name"
+    var imageProfile: Bitmap? = null
+    var email: String = "email"
 }
 
 class MainActivity : ComponentActivity() {
@@ -169,6 +172,7 @@ class MainActivity : ComponentActivity() {
                     val user = auth.currentUser
                     val uid = user?.uid
                     val nickname = user?.email
+
                     // Пример URL для аватара
                     val avatarPath = "https://yt3.ggpht.com/a/AATXAJzdmRM10P6trPdRbMeGM7BVbYUMdhbgtWqiUw=s900-c-k-c0xffffffff-no-rj-mo"
                     if (uid != null) {
@@ -182,6 +186,7 @@ class MainActivity : ComponentActivity() {
                         // Обновляем глобальный объект User (предполагается, что он создан как object User)
                         User.id = uid
                         User.name = user.email.toString()
+                        User.email = user.email.toString()
                         FirebaseDatabase.getInstance().getReference("Users")
                             .child(uid)
                             .updateChildren(userData)
@@ -212,6 +217,7 @@ class MainActivity : ComponentActivity() {
                             if (snapshot.exists()) {
                                 User.id = uid
                                 User.name = snapshot.child("Username").getValue(String::class.java).orEmpty()
+                                User.email = email.toString()
                                 navigateToHome()
                                 Toast.makeText(this, "Вход выполнен!", Toast.LENGTH_SHORT).show()
                             } else {
@@ -254,6 +260,7 @@ class MainActivity : ComponentActivity() {
                                 // Обновляем глобальный объект User
                                 User.id = uid
                                 User.name = account.displayName.toString()
+                                User.email = account.email.toString()
 
                                 val userRef = FirebaseDatabase.getInstance().getReference("Users").child(uid)
 

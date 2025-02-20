@@ -3,6 +3,7 @@ package com.QuQ.yomucards
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.database.sqlite.SQLiteDatabase
@@ -31,7 +32,8 @@ data class Kana(val symbol: String, val pronunciation: String, val type: KanaTyp
 
 enum class KanaType {
     HIRAGANA,
-    KATAKANA
+    KATAKANA,
+    KANJI
 }
 
 class SearchFragment : Fragment() {
@@ -46,6 +48,7 @@ class SearchFragment : Fragment() {
     // Изменяемый список, который передаём адаптеру
     private val kanaList = mutableListOf<Kana>()
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -206,6 +209,7 @@ class KanaAdapter(private val kanaList: MutableList<Kana> , private val onItemCl
         when (kana.type) {
             KanaType.HIRAGANA -> holder.kanaSymbol.setTextColor(Color.BLUE) // Цвет для хираганы
             KanaType.KATAKANA -> holder.kanaSymbol.setTextColor(Color.GREEN) // Цвет для катаканы
+            KanaType.KANJI -> holder.kanaSymbol.setTextColor(Color.BLACK)
         }
     }
 
@@ -269,18 +273,25 @@ class DatabaseHelper(context: Context, fileName: String) : SQLiteOpenHelper(
         val db = getDatabase()
 
         val cursor = if (query.isNullOrEmpty()) {
-            db.rawQuery("SELECT kana, ENtranscription FROM Hiragana " +
-                    "UNION " +
-                    "SELECT kana, ENtranscription FROM Katakana",
-                null)
+            db.rawQuery(
+                "SELECT kana, ENtranscription, ID, 1 as sort_order FROM Hiragana " +
+                        "UNION ALL " +
+                        "SELECT kana, ENtranscription, ID, 2 as sort_order FROM Katakana " +
+                        "UNION ALL " +
+                        "SELECT kanj, ENtranscription, ID, 3 as sort_order FROM Kanji " +
+                        "ORDER BY sort_order, ID",
+                null
+            )
         } else {
             val likeQueryKana = "%$query%"
             val likeQueryTranscription = "$query%"
             db.rawQuery(
                 "SELECT Hiragana.kana, Hiragana.ENtranscription FROM Hiragana WHERE Hiragana.kana LIKE ? OR Hiragana.ENtranscription LIKE ? OR Hiragana.RUtranscription LIKE ? " +
                         "UNION " +
-                        "SELECT Katakana.kana, Katakana.ENtranscription FROM Katakana WHERE Katakana.kana LIKE ? OR Katakana.ENtranscription LIKE ? OR Katakana.RUtranscription LIKE ?",
-                arrayOf("$query%", "$query%", "$query%", "$query%", "$query%", "$query%")
+                        "SELECT Katakana.kana, Katakana.ENtranscription FROM Katakana WHERE Katakana.kana LIKE ? OR Katakana.ENtranscription LIKE ? OR Katakana.RUtranscription LIKE ? " +
+                        "UNION " +
+                        "SELECT Kanji.kanj, Kanji.ENtranscription FROM Kanji WHERE Kanji.kanj LIKE ? OR Kanji.ENtranscription LIKE ? OR Kanji.RUtranscription LIKE ?",
+                arrayOf("$query%", "$query%", "$query%", "$query%", "$query%", "$query%", "$query%", "$query%", "$query%")
             )
         }
 
@@ -288,8 +299,12 @@ class DatabaseHelper(context: Context, fileName: String) : SQLiteOpenHelper(
             while (it.moveToNext()) {
                 val kana = it.getString(0)
                 val ENtranscription = it.getString(1)
-                // Определяем, является ли символ хираганой или катаканой
-                val type = if (kana.all { it in 'ぁ'..'ん' }) KanaType.HIRAGANA else KanaType.KATAKANA
+                // Определяем тип символа
+                val type = when {
+                    kana.all { it in 'ぁ'..'ん' } -> KanaType.HIRAGANA
+                    kana.all { it in 'ァ'..'ン' } -> KanaType.KATAKANA
+                    else -> KanaType.KANJI
+                }
                 kanaList.add(Kana(kana, ENtranscription, type))
             }
         }
