@@ -38,6 +38,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
 import com.bumptech.glide.Glide
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -49,6 +50,7 @@ object User {
     var name: String = "name"
     var imageProfile: Bitmap? = null
     var email: String = "email"
+
 }
 
 class MainActivity : ComponentActivity() {
@@ -259,18 +261,22 @@ class MainActivity : ComponentActivity() {
                             if (uid != null) {
                                 // Обновляем глобальный объект User
                                 User.id = uid
-                                User.name = account.displayName.toString()
+                                //User.name = account.displayName.toString()
                                 User.email = account.email.toString()
 
                                 val userRef = FirebaseDatabase.getInstance().getReference("Users").child(uid)
+
 
                                 // Сначала считываем текущие данные
                                 userRef.get().addOnSuccessListener { snapshot ->
                                     val updates = mutableMapOf<String, Any>()
                                     // Если поле Username не существует и displayName не null — добавляем его
+
                                     if (!snapshot.hasChild("Username") && account.displayName != null) {
                                         updates["Username"] = account.displayName!!
                                     }
+                                    val username = snapshot.child("Username").getValue(String::class.java)
+                                    User.name = username.toString()
                                     // Аналогично для Email
                                     if (!snapshot.hasChild("Email") && account.email != null) {
                                         updates["Email"] = account.email!!

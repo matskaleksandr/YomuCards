@@ -1,5 +1,6 @@
 package com.QuQ.yomucards
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -27,6 +28,16 @@ class LessonsFragment : Fragment(R.layout.fragment_lessons) {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var toolbar: androidx.appcompat.widget.Toolbar
     private lateinit var drawerToggle: ActionBarDrawerToggle
+
+
+    @SuppressLint("SetTextI18n")
+    override fun onStart() {
+        super.onStart()
+        // Обновляем TextView с именем пользователя
+        view?.findViewById<TextView>(R.id.textViewName)?.text = User.name ?: "Unknown"
+        view?.findViewById<ImageView>(R.id.imageView)?.setImageBitmap(User.imageProfile)
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

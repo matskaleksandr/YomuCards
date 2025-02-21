@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:theme="@style/Theme.YomuCards"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    >
+
+    <!-- Заголовок -->
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Редактировать профиль"
+        android:textSize="24sp"
+        android:textColor="@color/black"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true" />
+
+    <!-- Аватарка -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/profileImage"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:layout_below="@id/titleText"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/yo"
+        android:contentDescription="Аватарка"
+        android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/CircleImageView"
+        app:strokeColor="@color/color1"
+        app:strokeWidth="2dp"
+
+
+        android:padding="2dp"
+        android:clipToPadding="false"
+        />
+
+    <!-- Кнопка изменения аватарки -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/changeImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Изменить аватарку"
+        android:layout_below="@id/profileImage"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"
+
+         />
+
+    <!-- Имя пользователя -->
+    <EditText
+        android:id="@+id/usernameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/changeImageButton"
+        android:layout_marginTop="30dp"
+        android:layout_marginHorizontal="20dp"
+        android:hint="Имя пользователя"
+        android:inputType="text"
+        android:padding="12dp"
+        android:background="@drawable/edittext_background" />
+
+    <!-- Кнопка сохранения -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/saveButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/usernameEditText"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="20dp"
+        android:text="Сохранить"
+
+         />
+
+</RelativeLayout>
