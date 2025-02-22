@@ -1,0 +1,13 @@
+<!-- res/drawable/dialog_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Закруглённые углы -->
+    <corners android:radius="16dp" />
+
+    <!-- Красная обводка -->
+    <stroke
+        android:width="2dp"
+        android:color="@color/red" /> <!-- Убедитесь, что у вас есть цвет red в res/colors.xml -->
+
+    <!-- Цвет фона -->
+    <solid android:color="@color/white" /> <!-- Белый фон -->
+</shape>

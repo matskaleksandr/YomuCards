@@ -24,11 +24,18 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.SearchView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 
-data class Kana(val symbol: String, val pronunciation: String, val type: KanaType)
+data class Kana(
+    val symbol: String,
+    val pronunciation: String,
+    val ruTranscription: String?, // Может быть null
+    val ruTranslation: String?,   // Может быть null
+    val type: KanaType
+)
 
 enum class KanaType {
     HIRAGANA,
@@ -56,10 +63,10 @@ class SearchFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_search, container, false)
 
         recyclerView = view.findViewById(R.id.recycler_view)
-
         infoButton = view.findViewById(R.id.info_button)
         infoText = view.findViewById(R.id.info_text)
         infoText.visibility = View.GONE
+
         infoButton.setOnClickListener {
             showInfoText()
         }
@@ -67,54 +74,45 @@ class SearchFragment : Fragment() {
         // Устанавливаем обработчик клика по экрану для скрытия текста
         view.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-                hideInfoText()  // Скрыть текст при клике на любом месте
-            }
-            // Перехватываем события касания для RecyclerView, чтобы они не мешали обработке
-            if (v is RecyclerView) {
-                v.requestDisallowInterceptTouchEvent(true)
+                hideInfoText()
             }
             false
         }
+
         recyclerView.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-                // Проверяем, был ли клик по элементу RecyclerView
                 val childView = recyclerView.findChildViewUnder(event.x, event.y)
                 if (childView == null) {
-                    // Если клик был по пустой области RecyclerView, скрываем текст
                     hideInfoText()
                 }
             }
-            false // Возвращаем false, чтобы другие события могли быть обработаны RecyclerView
+            false
         }
 
-        // Инициализация SearchView из разметки
+        // Инициализация SearchView
         val searchView = view.findViewById<SearchView>(R.id.search_view)
 
         // Определяем количество колонок в зависимости от ориентации экрана
         val spanCount = if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 4 else 3
         recyclerView.layoutManager = GridLayoutManager(requireContext(), spanCount)
 
-        // Передаём изменяемый список адаптеру
-        adapter = KanaAdapter(kanaList){
+        // Передаём FragmentManager в адаптер
+        adapter = KanaAdapter(kanaList, parentFragmentManager) {
             hideInfoText() // Вызываем hideInfoText при клике на элемент
         }
         recyclerView.adapter = adapter
 
-        // Загружаем первоначальные данные (без фильтра, или можно задать пустой запрос)
+        // Загружаем первоначальные данные
         loadDataWithQuery("")
 
         // Установка слушателя для отслеживания изменений текста
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            // Вызывается при изменении текста (добавление/удаление символов)
             override fun onQueryTextChange(newText: String?): Boolean {
-                // Выполняем запрос с текущим текстом поиска
                 loadDataWithQuery(newText ?: "")
                 return false
             }
 
-            // Вызывается при отправке запроса (например, нажатии кнопки "поиск" на клавиатуре)
             override fun onQueryTextSubmit(query: String?): Boolean {
-                // Можно обработать подтверждение запроса, если требуется
                 loadDataWithQuery(query ?: "")
                 return false
             }
@@ -190,8 +188,11 @@ class SearchFragment : Fragment() {
     }
 }
 
-class KanaAdapter(private val kanaList: MutableList<Kana> , private val onItemClick: () -> Unit) :
-    RecyclerView.Adapter<KanaAdapter.KanaViewHolder>() {
+class KanaAdapter(
+    private val kanaList: MutableList<Kana>,
+    private val fragmentManager: FragmentManager, // Передаём FragmentManager
+    private val onItemClick: () -> Unit
+) : RecyclerView.Adapter<KanaAdapter.KanaViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): KanaViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -207,8 +208,8 @@ class KanaAdapter(private val kanaList: MutableList<Kana> , private val onItemCl
 
         // Устанавливаем цвет текста в зависимости от типа
         when (kana.type) {
-            KanaType.HIRAGANA -> holder.kanaSymbol.setTextColor(Color.BLUE) // Цвет для хираганы
-            KanaType.KATAKANA -> holder.kanaSymbol.setTextColor(Color.GREEN) // Цвет для катаканы
+            KanaType.HIRAGANA -> holder.kanaSymbol.setTextColor(Color.BLUE)
+            KanaType.KATAKANA -> holder.kanaSymbol.setTextColor(Color.GREEN)
             KanaType.KANJI -> holder.kanaSymbol.setTextColor(Color.BLACK)
         }
     }
@@ -221,10 +222,17 @@ class KanaAdapter(private val kanaList: MutableList<Kana> , private val onItemCl
 
         fun bind(kana: Kana) {
             kanaSymbol.text = kana.symbol
+            kanaPronunciation.text = kana.pronunciation
+
             itemView.setOnClickListener {
                 onItemClick() // Вызов метода, переданного из фрагмента
-                Log.d("Click", "++++")
+                showKanaInfoDialog(kana) // Показываем диалог с информацией
             }
+        }
+
+        private fun showKanaInfoDialog(kana: Kana) {
+            val dialog = KanaInfoDialogFragment(kana)
+            dialog.show(fragmentManager, "KanaInfoDialog") // Используем переданный FragmentManager
         }
     }
 }
@@ -274,11 +282,11 @@ class DatabaseHelper(context: Context, fileName: String) : SQLiteOpenHelper(
 
         val cursor = if (query.isNullOrEmpty()) {
             db.rawQuery(
-                "SELECT kana, ENtranscription, ID, 1 as sort_order FROM Hiragana " +
+                "SELECT kana, ENtranscription, RUtranscription, NULL as RUtranslation, ID, 1 as sort_order FROM Hiragana " +
                         "UNION ALL " +
-                        "SELECT kana, ENtranscription, ID, 2 as sort_order FROM Katakana " +
+                        "SELECT kana, ENtranscription, RUtranscription, NULL as RUtranslation, ID, 2 as sort_order FROM Katakana " +
                         "UNION ALL " +
-                        "SELECT kanj, ENtranscription, ID, 3 as sort_order FROM Kanji " +
+                        "SELECT kanj, ENtranscription, RUtranscription, RUtranslation, ID, 3 as sort_order FROM Kanji " +
                         "ORDER BY sort_order, ID",
                 null
             )
@@ -286,11 +294,11 @@ class DatabaseHelper(context: Context, fileName: String) : SQLiteOpenHelper(
             val likeQueryKana = "%$query%"
             val likeQueryTranscription = "$query%"
             db.rawQuery(
-                "SELECT Hiragana.kana, Hiragana.ENtranscription FROM Hiragana WHERE Hiragana.kana LIKE ? OR Hiragana.ENtranscription LIKE ? OR Hiragana.RUtranscription LIKE ? " +
+                "SELECT Hiragana.kana, Hiragana.ENtranscription, Hiragana.RUtranscription, NULL as RUtranslation FROM Hiragana WHERE Hiragana.kana LIKE ? OR Hiragana.ENtranscription LIKE ? OR Hiragana.RUtranscription LIKE ? " +
                         "UNION " +
-                        "SELECT Katakana.kana, Katakana.ENtranscription FROM Katakana WHERE Katakana.kana LIKE ? OR Katakana.ENtranscription LIKE ? OR Katakana.RUtranscription LIKE ? " +
+                        "SELECT Katakana.kana, Katakana.ENtranscription, Katakana.RUtranscription, NULL as RUtranslation FROM Katakana WHERE Katakana.kana LIKE ? OR Katakana.ENtranscription LIKE ? OR Katakana.RUtranscription LIKE ? " +
                         "UNION " +
-                        "SELECT Kanji.kanj, Kanji.ENtranscription FROM Kanji WHERE Kanji.kanj LIKE ? OR Kanji.ENtranscription LIKE ? OR Kanji.RUtranscription LIKE ?",
+                        "SELECT Kanji.kanj, Kanji.ENtranscription, Kanji.RUtranscription, Kanji.RUtranslation FROM Kanji WHERE Kanji.kanj LIKE ? OR Kanji.ENtranscription LIKE ? OR Kanji.RUtranscription LIKE ?",
                 arrayOf("$query%", "$query%", "$query%", "$query%", "$query%", "$query%", "$query%", "$query%", "$query%")
             )
         }
@@ -299,13 +307,15 @@ class DatabaseHelper(context: Context, fileName: String) : SQLiteOpenHelper(
             while (it.moveToNext()) {
                 val kana = it.getString(0)
                 val ENtranscription = it.getString(1)
+                val RUtranscription = it.getString(2) // Русская транскрипция
+                val RUtranslation = it.getString(3)   // Русский перевод (может быть null)
                 // Определяем тип символа
                 val type = when {
                     kana.all { it in 'ぁ'..'ん' } -> KanaType.HIRAGANA
                     kana.all { it in 'ァ'..'ン' } -> KanaType.KATAKANA
                     else -> KanaType.KANJI
                 }
-                kanaList.add(Kana(kana, ENtranscription, type))
+                kanaList.add(Kana(kana, ENtranscription, RUtranscription, RUtranslation, type))
             }
         }
         db.close()
