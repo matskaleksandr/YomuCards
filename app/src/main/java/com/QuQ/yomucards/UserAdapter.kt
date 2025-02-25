@@ -50,12 +50,19 @@ class UserAdapter(private val userList: List<UserF>) : RecyclerView.Adapter<User
             }
 
             // Обновляем состояние кнопки
-            if (user.isFriendRequestSent) {
-                removeFriendButton.isEnabled = false
-                removeFriendButton.text = "Заявка отправлена"
-            } else {
-                removeFriendButton.isEnabled = true
-                removeFriendButton.text = "Добавить"
+            when {
+                user.isFriend -> {
+                    removeFriendButton.isEnabled = false
+                    removeFriendButton.text = "Друзья"
+                }
+                user.isFriendRequestSent -> {
+                    removeFriendButton.isEnabled = false
+                    removeFriendButton.text = "Отправлено"
+                }
+                else -> {
+                    removeFriendButton.isEnabled = true
+                    removeFriendButton.text = "Добавить"
+                }
             }
 
             // Обработка нажатия на кнопку "Добавить"

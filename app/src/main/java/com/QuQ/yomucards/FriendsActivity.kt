@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import androidx.appcompat.widget.SearchView
 import android.widget.TextView
 import android.widget.Toast
@@ -47,6 +48,11 @@ class FriendsActivity : AppCompatActivity() {
         searchResultsRecyclerView.layoutManager = LinearLayoutManager(this)
         searchResultsAdapter = UserAdapter(searchResultsList)
         searchResultsRecyclerView.adapter = searchResultsAdapter
+
+        val exitButton = findViewById<ImageButton>(R.id.btnExitFriends)
+        exitButton.setOnClickListener{
+            finish()
+        }
 
         // Настройка SearchView
         setupSearchView()
@@ -98,7 +104,9 @@ class FriendsActivity : AppCompatActivity() {
                         val username = userSnapshot.child("Username").getValue(String::class.java)
                         val avatarPath = userSnapshot.child("AvatarPath").getValue(String::class.java) ?: ""
                         val friendRequests = userSnapshot.child("friend_requests").children
+                        val friends = userSnapshot.child("friends").children
                         var isFriendRequestSent = false
+                        var isFriend = false
 
                         // Проверяем, отправлена ли заявка текущим пользователем
                         if (currentUser != null) {
@@ -108,10 +116,18 @@ class FriendsActivity : AppCompatActivity() {
                                     break
                                 }
                             }
+
+                            // Проверяем, является ли текущий пользователь другом
+                            for (friend in friends) {
+                                if (friend.key == currentUserId) {
+                                    isFriend = true
+                                    break
+                                }
+                            }
                         }
 
                         if (username != null) {
-                            val user = UserF(userId, username, avatarPath, isFriendRequestSent)
+                            val user = UserF(userId, username, avatarPath, isFriendRequestSent, isFriend)
                             searchResultsList.add(user)
                         }
                     }

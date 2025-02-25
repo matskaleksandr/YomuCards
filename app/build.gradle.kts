@@ -13,8 +13,8 @@ android {
         applicationId = "com.QuQ.YomuCards"
         minSdk = 24
         targetSdk = 34
-        versionCode = 4
-        versionName = "0.4 alpha"
+        versionCode = 5
+        versionName = "0.5 alpha"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

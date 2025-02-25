@@ -9,6 +9,7 @@ import android.os.Bundle
 
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -57,6 +58,11 @@ class EditProfileActivity : ComponentActivity() {
         // Изменение аватарки
         changeImageButton.setOnClickListener {
             openImageChooser()
+        }
+
+        val exitButton = findViewById<ImageButton>(R.id.btnExitEditProfile)
+        exitButton.setOnClickListener{
+            finish()
         }
 
         // Сохранение изменений
@@ -137,15 +143,14 @@ class EditProfileActivity : ComponentActivity() {
                                 // Получаем Bitmap из ImageView
                                 val originalBitmap = drawable.bitmap
 
-                                // Сжимаем Bitmap до 152x152 пикселей
-                                val resizedBitmap = resizeBitmap(originalBitmap, 512, 512)
+                                val resizedBitmap = resizeBitmap(originalBitmap, originalBitmap.width / 2, originalBitmap.height / 2)
 
                                 // Сохраняем сжатый Bitmap в User.imageProfile
                                 User.imageProfile = resizedBitmap
 
                                 // Переходим в другое Activity
                                 val intent = Intent(this, ProfileActivity::class.java)
-                                startActivity(intent)
+                                //startActivity(intent)
                             }
                             Toast.makeText(this, "Данные успешно обновлены!", Toast.LENGTH_SHORT).show()
                             finish()

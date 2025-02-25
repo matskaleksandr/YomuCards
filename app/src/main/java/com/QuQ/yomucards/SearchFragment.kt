@@ -1,7 +1,5 @@
 package com.QuQ.yomucards
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
@@ -9,7 +7,6 @@ import android.content.res.Configuration
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.graphics.Color
-import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -20,20 +17,25 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import android.widget.LinearLayout
+import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.database
 import java.io.File
 
 data class Kana(
+    val id: Int,
     val symbol: String,
     val pronunciation: String,
-    val ruTranscription: String?, // Может быть null
-    val ruTranslation: String?,   // Может быть null
+    val ruTranscription: String?,
+    val ruTranslation: String?,
     val type: KanaType
 )
 
@@ -43,7 +45,7 @@ enum class KanaType {
     KANJI
 }
 
-class SearchFragment : Fragment() {
+class SearchFragment : Fragment(), OnCardRemovedListener {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: KanaAdapter
@@ -54,6 +56,27 @@ class SearchFragment : Fragment() {
 
     // Изменяемый список, который передаём адаптеру
     private val kanaList = mutableListOf<Kana>()
+
+    override fun onCardRemoved(kana: Kana) {
+        // Обновляем список в SearchFragment
+        val type = when (kana.type) {
+            KanaType.HIRAGANA -> "Hiragana"
+            KanaType.KATAKANA -> "Katakana"
+            KanaType.KANJI -> "Kanji"
+        }
+        adapter.addedCards[type]?.remove(kana.id.toString())
+        adapter.notifyDataSetChanged() // Обновляем RecyclerView
+    }
+    override fun onCardAdded(kana: Kana) {
+        val type = when (kana.type) {
+            KanaType.HIRAGANA -> "Hiragana"
+            KanaType.KATAKANA -> "Katakana"
+            KanaType.KANJI -> "Kanji"
+        }
+        adapter.addedCards[type]?.add(kana.id.toString())
+        adapter.notifyItemChanged(adapter.findPositionById(kana.id)) // Обновляем конкретную позицию
+    }
+
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -97,9 +120,14 @@ class SearchFragment : Fragment() {
         recyclerView.layoutManager = GridLayoutManager(requireContext(), spanCount)
 
         // Передаём FragmentManager в адаптер
-        adapter = KanaAdapter(kanaList, parentFragmentManager) {
-            hideInfoText() // Вызываем hideInfoText при клике на элемент
-        }
+        adapter = KanaAdapter(
+            kanaList,
+            parentFragmentManager, // Используем parentFragmentManager для фрагментов
+            {
+                // Обработчик клика на элемент
+            },
+            this // Передаем OnCardRemovedListener
+        )
         recyclerView.adapter = adapter
 
         // Загружаем первоначальные данные
@@ -118,7 +146,34 @@ class SearchFragment : Fragment() {
             }
         })
 
+        loadAddedCards()
+
         return view
+    }
+
+    private fun loadAddedCards() {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser == null) return
+
+        val database = Firebase.database.reference
+        val userId = currentUser.uid
+
+        // Загружаем добавленные карточки для всех типов
+        val types = listOf("Hiragana", "Katakana", "Kanji")
+        val addedCards = mutableMapOf<String, MutableSet<String>>()
+
+        types.forEach { type ->
+            val path = "Users/$userId/Stats_YomuCards/Cards/$type"
+            database.child(path).get().addOnSuccessListener { snapshot ->
+                val ids = snapshot.children.map { it.key ?: "" }.toMutableSet()
+
+                addedCards[type] = ids
+                adapter.updateAddedCards(addedCards) // Обновляем адаптер
+                adapter.notifyDataSetChanged()
+            }.addOnFailureListener { e ->
+                Toast.makeText(requireContext(), "Ошибка загрузки: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun showInfoText() {
@@ -162,6 +217,7 @@ class SearchFragment : Fragment() {
         super.onResume()
         // Загружаем данные без фильтра при возврате к фрагменту
         loadDataWithQuery("")
+        loadAddedCards()
     }
 
     // Новый метод для загрузки данных по поисковому запросу
@@ -190,9 +246,28 @@ class SearchFragment : Fragment() {
 
 class KanaAdapter(
     private val kanaList: MutableList<Kana>,
-    private val fragmentManager: FragmentManager, // Передаём FragmentManager
-    private val onItemClick: () -> Unit
+    private val fragmentManager: FragmentManager,
+    private val onItemClick: () -> Unit,
+    private val onCardRemovedListener: OnCardRemovedListener // Передаем слушатель
 ) : RecyclerView.Adapter<KanaAdapter.KanaViewHolder>() {
+
+    fun findPositionById(id: Int): Int {
+        return kanaList.indexOfFirst { it.id == id }
+    }
+    fun updateData(newData: List<Kana>) {
+        kanaList.clear()
+        kanaList.addAll(newData)
+        notifyDataSetChanged()
+    }
+    // Храним добавленные карточки с учётом типа
+    val addedCards = mutableMapOf<String, MutableSet<String>>()
+
+    // Метод для обновления списка добавленных карточек
+    fun updateAddedCards(newAddedCards: Map<String, MutableSet<String>>) {
+        addedCards.clear()
+        addedCards.putAll(newAddedCards)
+        notifyDataSetChanged() // Обновляем все элементы
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): KanaViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -202,37 +277,69 @@ class KanaAdapter(
 
     override fun onBindViewHolder(holder: KanaViewHolder, position: Int) {
         val kana = kanaList[position]
-        holder.kanaSymbol.text = kana.symbol
-        holder.kanaPronunciation.text = kana.pronunciation
         holder.bind(kana)
 
-        // Устанавливаем цвет текста в зависимости от типа
-        when (kana.type) {
-            KanaType.HIRAGANA -> holder.kanaSymbol.setTextColor(Color.BLUE)
-            KanaType.KATAKANA -> holder.kanaSymbol.setTextColor(Color.GREEN)
-            KanaType.KANJI -> holder.kanaSymbol.setTextColor(Color.BLACK)
+        // Проверяем, добавлена ли карточка
+        val cardType = when (kana.type) {
+            KanaType.HIRAGANA -> "Hiragana"
+            KanaType.KATAKANA -> "Katakana"
+            KanaType.KANJI -> "Kanji"
         }
+        val isAdded = addedCards[cardType]?.contains(kana.id.toString()) ?: false
+        holder.setAddedState(isAdded)
+
+        //holder.itemView.animate().cancel()
+        //holder.itemView.alpha = 0f
+        //holder.itemView.animate().alpha(1f).setDuration(300).start()
     }
 
     override fun getItemCount(): Int = kanaList.size
 
     inner class KanaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val kanaSymbol: TextView = itemView.findViewById(R.id.kana_symbol)
-        val kanaPronunciation: TextView = itemView.findViewById(R.id.kana_pronunciation)
+        private val kanaSymbol: TextView = itemView.findViewById(R.id.kana_symbol)
+        private val kanaPronunciation: TextView = itemView.findViewById(R.id.kana_pronunciation)
+        private val greenCircle: ImageView = itemView.findViewById(R.id.green_circle)
 
         fun bind(kana: Kana) {
             kanaSymbol.text = kana.symbol
             kanaPronunciation.text = kana.pronunciation
 
+            when (kana.type) {
+                KanaType.HIRAGANA -> kanaSymbol.setTextColor(Color.BLUE)
+                KanaType.KATAKANA -> kanaSymbol.setTextColor(Color.GREEN)
+                KanaType.KANJI -> kanaSymbol.setTextColor(Color.BLACK)
+            }
+
+            val cardType = when (kana.type) {
+                KanaType.HIRAGANA -> "Hiragana"
+                KanaType.KATAKANA -> "Katakana"
+                KanaType.KANJI -> "Kanji"
+            }
+            val isAdded = addedCards[cardType]?.contains(kana.id.toString()) ?: false
+            setAddedState(isAdded)
+
             itemView.setOnClickListener {
-                onItemClick() // Вызов метода, переданного из фрагмента
-                showKanaInfoDialog(kana) // Показываем диалог с информацией
+                Log.d("KanaAdapter", "Элемент ${kana.symbol} нажат")
+                showKanaInfoDialog(kana)
             }
         }
 
+        fun setAddedState(isAdded: Boolean) {
+            greenCircle.visibility = if (isAdded) View.VISIBLE else View.INVISIBLE
+        }
+
         private fun showKanaInfoDialog(kana: Kana) {
-            val dialog = KanaInfoDialogFragment(kana)
-            dialog.show(fragmentManager, "KanaInfoDialog") // Используем переданный FragmentManager
+            val dialog = KanaInfoDialogFragment(
+                kana,
+                this@KanaAdapter,
+                this,
+                {
+                    val position = findPositionById(kana.id)
+                    if (position != -1) notifyItemChanged(position)
+                },
+                onCardRemovedListener
+            )
+            dialog.show(fragmentManager, "KanaInfoDialog")
         }
     }
 }
@@ -291,15 +398,23 @@ class DatabaseHelper(context: Context, fileName: String) : SQLiteOpenHelper(
                 null
             )
         } else {
-            val likeQueryKana = "%$query%"
-            val likeQueryTranscription = "$query%"
+            val likeQuery = "$query%"
             db.rawQuery(
-                "SELECT Hiragana.kana, Hiragana.ENtranscription, Hiragana.RUtranscription, NULL as RUtranslation FROM Hiragana WHERE Hiragana.kana LIKE ? OR Hiragana.ENtranscription LIKE ? OR Hiragana.RUtranscription LIKE ? " +
-                        "UNION " +
-                        "SELECT Katakana.kana, Katakana.ENtranscription, Katakana.RUtranscription, NULL as RUtranslation FROM Katakana WHERE Katakana.kana LIKE ? OR Katakana.ENtranscription LIKE ? OR Katakana.RUtranscription LIKE ? " +
-                        "UNION " +
-                        "SELECT Kanji.kanj, Kanji.ENtranscription, Kanji.RUtranscription, Kanji.RUtranslation FROM Kanji WHERE Kanji.kanj LIKE ? OR Kanji.ENtranscription LIKE ? OR Kanji.RUtranscription LIKE ?",
-                arrayOf("$query%", "$query%", "$query%", "$query%", "$query%", "$query%", "$query%", "$query%", "$query%")
+                """
+            SELECT kana, ENtranscription, RUtranscription, NULL as RUtranslation, ID FROM Hiragana 
+            WHERE kana LIKE ? OR ENtranscription LIKE ? OR RUtranscription LIKE ?
+            UNION ALL
+            SELECT kana, ENtranscription, RUtranscription, NULL as RUtranslation, ID FROM Katakana 
+            WHERE kana LIKE ? OR ENtranscription LIKE ? OR RUtranscription LIKE ?
+            UNION ALL
+            SELECT kanj, ENtranscription, RUtranscription, RUtranslation, ID FROM Kanji 
+            WHERE kanj LIKE ? OR ENtranscription LIKE ? OR RUtranscription LIKE ?
+            """,
+                arrayOf(
+                    likeQuery, likeQuery, likeQuery,
+                    likeQuery, likeQuery, likeQuery,
+                    likeQuery, likeQuery, likeQuery
+                )
             )
         }
 
@@ -315,7 +430,8 @@ class DatabaseHelper(context: Context, fileName: String) : SQLiteOpenHelper(
                     kana.all { it in 'ァ'..'ン' } -> KanaType.KATAKANA
                     else -> KanaType.KANJI
                 }
-                kanaList.add(Kana(kana, ENtranscription, RUtranscription, RUtranslation, type))
+                val id = it.getInt(4) // Получаем ID из курсора
+                kanaList.add(Kana(id, kana, ENtranscription, RUtranscription, RUtranslation, type))
             }
         }
         db.close()

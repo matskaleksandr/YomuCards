@@ -1,79 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:theme="@style/Theme.YomuCards"
-    android:padding="16dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <!-- Изображение профиля -->
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/ivProfilePicture"
-        android:layout_width="160dp"
-        android:layout_height="160dp"
-        android:layout_gravity="center"
-        android:scaleType="centerCrop"
-        android:src="@drawable/yo"
-        app:shapeAppearanceOverlay="@style/CircleImageView"
-        app:strokeColor="@color/color1"
-        app:strokeWidth="2dp"
-        android:padding="2dp"
-        android:clipToPadding="false"
-    android:layout_marginTop="20dp" />
-
-    <!-- Имя пользователя -->
-    <TextView
-        android:id="@+id/tvUserName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Имя пользователя"
-        android:textSize="35sp"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:layout_marginTop="16dp"
-        android:layout_gravity="center" />
-
-    <!-- Email пользователя -->
-    <TextView
-        android:id="@+id/tvEmail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="user@example.com"
-        android:textSize="16sp"
-        android:layout_marginTop="8dp"
-        android:layout_gravity="center" />
-
-    <!-- Id пользователя -->
-    <TextView
-        android:id="@+id/tvId"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Id: 123456789123456789"
-        android:textSize="16sp"
-        android:layout_marginTop="8dp"
-        android:layout_gravity="center" />
-
-    <!-- Пустое пространство, чтобы кнопка ушла вниз -->
-    <View
+    <!-- Существующий макет с элементами -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:theme="@style/Theme.YomuCards"
+        android:padding="16dp">
 
-    <!-- Кнопка для перехода в режим редактирования -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnOutAccount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Выйти из аккаунта"
-        android:layout_marginBottom="16dp"
-        android:layout_gravity="center" />
+        <!-- Изображение профиля -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivProfilePicture"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:src="@drawable/yo"
+            app:shapeAppearanceOverlay="@style/CircleImageView"
+            app:strokeColor="@color/color1"
+            app:strokeWidth="2dp"
+            android:padding="2dp"
+            android:clipToPadding="false"
+            android:layout_marginTop="20dp" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnEdit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Редактировать профиль"
-        android:layout_marginBottom="16dp"
-        android:layout_gravity="center" />
-</LinearLayout>
+        <!-- Имя пользователя -->
+        <TextView
+            android:id="@+id/tvUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Имя пользователя"
+            android:textSize="35sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginTop="16dp"
+            android:layout_gravity="center" />
+
+        <!-- Email пользователя -->
+        <TextView
+            android:id="@+id/tvEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="user@example.com"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center" />
+
+        <!-- Id пользователя -->
+        <TextView
+            android:id="@+id/tvId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Id: 123456789123456789"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center" />
+
+        <!-- Пустое пространство, чтобы кнопка ушла вниз -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Кнопка для перехода в режим редактирования -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOutAccount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Выйти из аккаунта"
+            android:layout_marginBottom="16dp"
+            android:layout_gravity="center" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEdit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Редактировать профиль"
+            android:layout_marginBottom="16dp"
+            android:layout_gravity="center" />
+    </LinearLayout>
+
+
+    <ImageButton
+        android:id="@+id/btnExitProfile"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/exit_arrow"
+        android:layout_gravity="top|start"
+        android:layout_margin="16dp" />
+</FrameLayout>

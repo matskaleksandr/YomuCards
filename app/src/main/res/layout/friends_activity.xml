@@ -1,67 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:padding="16dp"
-    tools:context=".FriendsActivity">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <!-- Поиск -->
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/searchView"
+    <!-- Основной макет -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:queryHint="Поиск по нику"
-        app:iconifiedByDefault="false"
-        android:iconifiedByDefault="false"
-        android:layout_marginBottom="16dp"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
+        tools:context=".FriendsActivity">
 
-    <!-- Результаты поиска (поверх всех элементов) -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/searchResultsRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:background="@android:color/white"
-        android:elevation="8dp"
-        android:layout_marginBottom="16dp"
-        tools:listitem="@layout/item_friend"/>
+        <!-- Поиск -->
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:queryHint="Поиск по нику"
+            app:iconifiedByDefault="false"
+            android:iconifiedByDefault="false"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="35dp"/>
 
-    <!-- Заголовок для заявок в друзья -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Заявки в друзья"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp"/>
+        <!-- Результаты поиска (поверх всех элементов) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/searchResultsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:background="@android:color/white"
+            android:elevation="8dp"
+            android:layout_marginBottom="16dp"
+            tools:listitem="@layout/item_friend"/>
 
-    <!-- Список заявок в друзья -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/friendRequestsRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:nestedScrollingEnabled="false"
-        tools:listitem="@layout/item_friend_request"/>
+        <!-- Заголовок для заявок в друзья -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Заявки в друзья"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
 
-    <!-- Заголовок для текущих друзей -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Текущие друзья"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp"/>
+        <!-- Список заявок в друзья -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/friendRequestsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:nestedScrollingEnabled="false"
+            tools:listitem="@layout/item_friend_request"/>
 
-    <!-- Список текущих друзей -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/friendsRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:nestedScrollingEnabled="false"
-        tools:listitem="@layout/item_friend"/>
+        <!-- Заголовок для текущих друзей -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Текущие друзья"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
 
-</LinearLayout>
+        <!-- Список текущих друзей -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/friendsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            tools:listitem="@layout/item_friend"/>
+    </LinearLayout>
+
+    <!-- Кнопка выхода в левом верхнем углу -->
+    <ImageButton
+        android:id="@+id/btnExitFriends"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/exit_arrow"
+        android:layout_gravity="top|start"
+        android:layout_margin="16dp" />
+
+</FrameLayout>
