@@ -8,6 +8,9 @@
         <item name="dialogCornerRadius">16dp</item> <!-- Закругление углов -->
         <item name="android:windowBackground">@android:color/transparent</item> <!-- Прозрачный фон -->
     </style>
-
+    <style name="RadioButtonStyle">
+        <item name="android:textSize">30sp</item>
+        <item name="android:textColor">@color/black</item> <!-- Опционально: измените цвет текста -->
+    </style>
 
 </resources>

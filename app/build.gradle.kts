@@ -13,8 +13,8 @@ android {
         applicationId = "com.QuQ.YomuCards"
         minSdk = 24
         targetSdk = 34
-        versionCode = 5
-        versionName = "0.5 alpha"
+        versionCode = 6
+        versionName = "0.6 alpha"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -34,6 +34,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    buildFeatures {
+        viewBinding = true
     }
     kotlinOptions {
         jvmTarget = "1.8"
@@ -78,6 +81,7 @@ dependencies {
 
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.transition:transition:1.4.1")
+
 
 
     implementation(libs.androidx.core.ktx)

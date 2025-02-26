@@ -77,6 +77,11 @@ class LessonsFragment : Fragment(R.layout.fragment_lessons) {
                     startActivity(intent)
                     true
                 }
+                R.id.nav_trenning -> {
+                    val intent = Intent(context, TrainingMyCardsActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
 
                 else -> false
             }
