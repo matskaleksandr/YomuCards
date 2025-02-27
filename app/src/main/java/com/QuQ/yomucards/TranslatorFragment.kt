@@ -1,5 +1,7 @@
 package com.QuQ.yomucards
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,6 +13,8 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -28,6 +32,10 @@ class TranslatorFragment : Fragment(R.layout.fragment_translator) {
     private val FOLDER_ID = "b1grbosn1c4l0gjtl9ul"
     private val BASE_URL = "https://translate.api.cloud.yandex.net/translate/v2/"
 
+    private lateinit var btnGolos: Button
+    private lateinit var tts: JapaneseTTS
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,7 +45,7 @@ class TranslatorFragment : Fragment(R.layout.fragment_translator) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        tts = JapaneseTTS(requireContext())
         val btnTranslate = view.findViewById<Button>(R.id.btn_translate)
         val etSourceText = view.findViewById<EditText>(R.id.edt_input)
         val btnSwap = view.findViewById<Button>(R.id.btn_swap)
@@ -45,6 +53,25 @@ class TranslatorFragment : Fragment(R.layout.fragment_translator) {
 
         val spinner_to =  view.findViewById<Spinner>(R.id.spinner_to)
         val spinner_from =  view.findViewById<Spinner>(R.id.spinner_from)
+
+        btnGolos = view.findViewById<Button>(R.id.btn_speak)
+
+        val btnCopy = view.findViewById<Button>(R.id.btn_copy)
+
+        btnCopy.setOnClickListener {
+            val textToCopy = etTranslatedText.text.toString()
+            val clipboard = getSystemService(requireContext(), ClipboardManager::class.java)
+            val clip = ClipData.newPlainText("Скопированный текст", textToCopy)
+            clipboard?.setPrimaryClip(clip)
+            Toast.makeText(requireContext(), "Текст скопирован", Toast.LENGTH_SHORT).show()
+
+        }
+
+
+        btnGolos.setOnClickListener {
+            val textToGolos = etTranslatedText.text.toString()
+            tts.speak(textToGolos)
+        }
 
         btnTranslate.setOnClickListener {
             val textToTranslate = etSourceText.text.toString()
@@ -68,6 +95,9 @@ class TranslatorFragment : Fragment(R.layout.fragment_translator) {
             val firstItemText = spinner_from.getItemAtPosition(0).toString()
             if(firstItemText != "ja"){
                 // Сохраняем текущие выбранные позиции
+
+                btnGolos.visibility = View.GONE
+
                 val selectedFrom = spinner_from.selectedItemPosition
                 val selectedTo = spinner_to.selectedItemPosition
 
@@ -83,6 +113,8 @@ class TranslatorFragment : Fragment(R.layout.fragment_translator) {
                 // Сохраняем текущие выбранные позиции
                 val selectedFrom = spinner_from.selectedItemPosition
                 val selectedTo = spinner_to.selectedItemPosition
+
+                btnGolos.visibility = View.VISIBLE
 
                 // Меняем адаптеры местами
                 spinner_from.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, fromArray)

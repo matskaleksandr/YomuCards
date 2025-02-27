@@ -6,38 +6,57 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.QuQ.yomucards.databinding.FragmentSymbolToTranscriptionBinding
 
 class SymbolToTranscriptionFragment(
-    var viewModel: TrainingViewModel
+    private val viewModel: TrainingViewModel
 ) : Fragment() {
 
-    private lateinit var binding: FragmentSymbolToTranscriptionBinding
+    private var _binding: FragmentSymbolToTranscriptionBinding? = null
+    private val binding get() = _binding!!
+    private var currentQuestionIndex: Int = 0
+
+    companion object {
+        private const val ARG_QUESTION_INDEX = "question_index"
+        fun newInstance(questionIndex: Int, viewModel: TrainingViewModel): SymbolToTranscriptionFragment {
+            val fragment = SymbolToTranscriptionFragment(viewModel)
+            val args = Bundle()
+            args.putInt(ARG_QUESTION_INDEX, questionIndex)
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        currentQuestionIndex = arguments?.getInt(ARG_QUESTION_INDEX) ?: 0
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentSymbolToTranscriptionBinding.inflate(inflater)
+    ): View {
+        _binding = FragmentSymbolToTranscriptionBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupUI()
+        setupListeners()
+    }
 
-        val question = viewModel.questions.value?.get(parentActivity.currentQuestionIndex)
-        if (question == null) {
-            parentActivity.goToNextQuestion()
+    private fun setupUI() {
+        val question = viewModel.questions.value?.getOrNull(currentQuestionIndex) ?: run {
+            (activity as? TrainingMyCardsActivity)?.goToNextQuestion()
             return
         }
-
-        // Устанавливаем символ из первого элемента списка items
         binding.symbolText.text = question.items.firstOrNull()?.first ?: ""
         binding.optionsRadioGroup.removeAllViews()
 
-        // Добавляем варианты ответов (строки)
         question.options.shuffled().forEach { option ->
             val radioButton = RadioButton(requireContext()).apply {
                 text = option
@@ -46,26 +65,29 @@ class SymbolToTranscriptionFragment(
             }
             binding.optionsRadioGroup.addView(radioButton)
         }
+    }
 
+    private fun setupListeners() {
         binding.submitButton.setOnClickListener {
             val selected = binding.optionsRadioGroup.findViewById<RadioButton>(
                 binding.optionsRadioGroup.checkedRadioButtonId
             )
             if (selected == null) {
-                // Пользователь не выбрал вариант ответа
-                // Можно показать сообщение об ошибке
+                Toast.makeText(requireContext(), "Выберите вариант ответа!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            // Проверяем, совпадает ли выбранный ответ с правильным (первый элемент items)
-            val correctAnswer = question.items.firstOrNull()?.second ?: ""
+            val correctAnswer = viewModel.questions.value
+                ?.getOrNull(currentQuestionIndex)
+                ?.items
+                ?.firstOrNull()
+                ?.second ?: ""
             val isCorrect = selected.tag == correctAnswer
-            if(!isCorrect){
-                return@setOnClickListener
-            }
-            parentActivity.handleAnswer(isCorrect)
+            (activity as? TrainingMyCardsActivity)?.handleAnswer(isCorrect)
         }
-
     }
 
-    private val parentActivity get() = activity as TrainingMyCardsActivity
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

@@ -50,7 +50,7 @@
         app:itemIconTint="@null"
         app:itemRippleColor="@android:color/transparent"
         android:background="?android:attr/windowBackground"
-        app:itemIconSize="60dp"
+        app:itemIconSize="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

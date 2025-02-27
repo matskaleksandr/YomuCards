@@ -45,12 +45,9 @@
         android:scrollbars="vertical"
         android:gravity="top|start"
         android:scrollHorizontally="false"
-        android:background="@android:color/transparent"/> <!-- Запрещает горизонтальную прокрутку -->
-
+        android:background="@android:color/transparent" /> <!-- Запрещает горизонтальную прокрутку -->
 
     <!-- Кнопка для перевода -->
-
-    <!-- Поле для вывода переведённого текста -->
     <Button
         android:id="@+id/btn_translate"
         android:layout_width="wrap_content"
@@ -58,6 +55,7 @@
         android:layout_gravity="center"
         android:text="Перевести" />
 
+    <!-- Поле для вывода переведённого текста -->
     <TextView
         android:id="@+id/txt_output"
         android:layout_width="match_parent"
@@ -66,5 +64,27 @@
         android:paddingTop="16dp"
         android:scrollbars="vertical"
         android:text="" />
+
+    <!-- Добавленные кнопки "Копировать" и "Озвучить" -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingTop="8dp">
+
+        <Button
+            android:id="@+id/btn_copy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Копировать" />
+
+        <Button
+            android:id="@+id/btn_speak"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Озвучить" />
+    </LinearLayout>
 
 </LinearLayout>

@@ -13,6 +13,6 @@ enum class QuestionType {
 data class TrainingQuestion(
     val type: QuestionType,
     val items: List<Pair<String?, String>> = emptyList(),
-    val options: List<String> = emptyList(), // Изменено на List<String>
+    val options: List<String> = emptyList(),
     var isAnsweredCorrectly: Boolean = false
 )

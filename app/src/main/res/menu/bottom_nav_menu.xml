@@ -2,19 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/nav_home"
-        android:icon="@drawable/ic_yo"
+        android:icon="@drawable/search_button"
         android:title="Поиск"
         android:tooltipText=""/>
 
     <item
         android:id="@+id/nav_search"
-        android:icon="@drawable/ic_yo"
+        android:icon="@drawable/lessons_button"
         android:title="Уроки"
         android:tooltipText=""/>
 
     <item
         android:id="@+id/nav_profile"
-        android:icon="@drawable/ic_yo"
+        android:icon="@drawable/translator_button"
         android:title="Переводчик"
         android:tooltipText=""/>
 </menu>

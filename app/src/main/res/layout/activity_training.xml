@@ -4,16 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- ViewPager2 для отображения вопросов -->
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewPager"
-        android:layout_width="0dp"
+    <FrameLayout
+        android:id="@+id/questionContainer"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/progressText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
+        app:layout_constraintBottom_toTopOf="@+id/progressText"/>
     <!-- Прогресс тренировки -->
     <TextView
         android:id="@+id/progressText"

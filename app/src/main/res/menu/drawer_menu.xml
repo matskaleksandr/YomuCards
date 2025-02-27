@@ -3,7 +3,7 @@
     <item
         android:id="@+id/nav_profile"
         android:title="Профиль"
-        android:icon="@drawable/ic_yo" />
+        android:icon="@drawable/profile_button" />
     <item
         android:id="@+id/nav_friends"
         android:title="Друзья"
@@ -12,7 +12,7 @@
     <item
         android:id="@+id/nav_cards"
         android:title="Мои карточки"
-        android:icon="@drawable/ic_yo" />
+        android:icon="@drawable/mycards_button" />
 
     <item
         android:id="@+id/nav_trenning"
@@ -22,6 +22,6 @@
     <item
         android:id="@+id/nav_settings"
         android:title="Настройки"
-        android:icon="@drawable/ic_yo" />
+        android:icon="@drawable/settings_button" />
     <!-- Добавьте дополнительные пункты по необходимости -->
 </menu>
