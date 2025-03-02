@@ -1,0 +1,55 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/dialog_kana_symbol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_gravity="center_horizontal"
+        android:text="Изучаемые символы"
+        android:padding="8dp"/>
+
+    <TextView
+        android:id="@+id/dialog_lesson_info_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:layout_gravity="left"
+        android:padding="8dp"/>
+
+    <!-- Горизонтальный контейнер для кнопок -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="30sp"
+        android:layout_gravity="left">
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnStartLesson"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Начать урок"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+
+    <!-- Кнопка "Закрыть" -->
+    <Button
+        android:id="@+id/btnCloseInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Закрыть"
+        android:background="@android:color/transparent"
+        android:textColor="@color/red"
+        android:layout_gravity="right"
+
+        />
+</LinearLayout>

@@ -3,6 +3,7 @@ package com.QuQ.yomucards
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
@@ -26,24 +27,30 @@ import java.io.InputStream
 import java.net.URL
 import java.net.HttpURLConnection
 import android.util.Log
-import androidx.core.view.ViewCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.io.*
-import android.view.MenuItem
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.LiveData
-import com.bumptech.glide.Glide
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.util.concurrent.TimeUnit
+import android.Manifest
+
+
+object LessonState {
+    var id: Int = 0
+    var kana: List<Kana>? = null
+    var LessonNumber: Int = 0
+}
 
 object User {
     var id: String = "-1"
@@ -66,6 +73,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // Устанавливаем макет
         setContentView(R.layout.activity_main)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestNotificationPermission()
+        } else {
+            scheduleDailyNotification()
+        }
 
         // Инициализируем элементы интерфейса
         val registerButton = findViewById<Button>(R.id.registerButton)
@@ -120,6 +133,41 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            // Разрешение предоставлено, планируем уведомления
+            scheduleDailyNotification()
+        } else {
+            // Разрешение не предоставлено, уведомления не будут отправляться
+        }
+    }
+
+    private fun requestNotificationPermission() {
+        // Проверяем, есть ли разрешение
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            // Разрешение уже предоставлено
+            scheduleDailyNotification()
+        } else {
+            // Запрашиваем разрешение
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    private fun scheduleDailyNotification() {
+        val dailyWorkRequest = PeriodicWorkRequest.Builder(
+            NotificationWorker::class.java,
+            1, TimeUnit.DAYS
+        ).build()
+
+        WorkManager.getInstance(this).enqueue(dailyWorkRequest)
+    }
+
     override fun onStart() {
         super.onStart()
         // При каждом запуске проверяем сохранённые данные входа
@@ -167,9 +215,9 @@ class MainActivity : ComponentActivity() {
                     // Сохраняем тип входа (email) и данные
                     storeLoginInfo("email", email, password)
 
-                    // Переход в домашнюю активность
+
                     navigateToHome()
-                    Toast.makeText(this, "Регистрация успешна!", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(this, "Регистрация успешна!", Toast.LENGTH_SHORT).show()
 
                     val user = auth.currentUser
                     val uid = user?.uid
@@ -221,7 +269,7 @@ class MainActivity : ComponentActivity() {
                                 User.name = snapshot.child("Username").getValue(String::class.java).orEmpty()
                                 User.email = email.toString()
                                 navigateToHome()
-                                Toast.makeText(this, "Вход выполнен!", Toast.LENGTH_SHORT).show()
+                                //Toast.makeText(this, "Вход выполнен!", Toast.LENGTH_SHORT).show()
                             } else {
                                 Toast.makeText(this, "Ошибка: данные пользователя не найдены", Toast.LENGTH_SHORT).show()
                             }
@@ -259,7 +307,7 @@ class MainActivity : ComponentActivity() {
                             // Пример URL для аватара
                             val avatarPath = "https://yt3.ggpht.com/a/AATXAJzdmRM10P6trPdRbMeGM7BVbYUMdhbgtWqiUw=s900-c-k-c0xffffffff-no-rj-mo"
                             if (uid != null) {
-                                // Обновляем глобальный объект User
+
                                 User.id = uid
                                 //User.name = account.displayName.toString()
                                 User.email = account.email.toString()
@@ -270,7 +318,6 @@ class MainActivity : ComponentActivity() {
                                 // Сначала считываем текущие данные
                                 userRef.get().addOnSuccessListener { snapshot ->
                                     val updates = mutableMapOf<String, Any>()
-                                    // Если поле Username не существует и displayName не null — добавляем его
 
                                     if (!snapshot.hasChild("Username") && account.displayName != null) {
                                         updates["Username"] = account.displayName!!
@@ -299,7 +346,7 @@ class MainActivity : ComponentActivity() {
                                             .addOnCompleteListener { dbTask ->
                                                 if (dbTask.isSuccessful) {
                                                     navigateToHome()
-                                                    Toast.makeText(this, "Вход через Google выполнен!", Toast.LENGTH_SHORT).show()
+                                                    //Toast.makeText(this, "Вход через Google выполнен!", Toast.LENGTH_SHORT).show()
                                                 } else {
                                                     Toast.makeText(this, "Ошибка при записи данных: ${dbTask.exception?.message}", Toast.LENGTH_SHORT).show()
                                                 }
@@ -307,14 +354,14 @@ class MainActivity : ComponentActivity() {
                                     } else {
                                         // Если обновлять нечего — просто переходим на HomeActivity
                                         navigateToHome()
-                                        Toast.makeText(this, "Вход через Google выполнен!", Toast.LENGTH_SHORT).show()
+                                        //Toast.makeText(this, "Вход через Google выполнен!", Toast.LENGTH_SHORT).show()
                                     }
                                 }.addOnFailureListener { error ->
                                     Toast.makeText(this, "Ошибка при чтении данных: ${error.message}", Toast.LENGTH_SHORT).show()
                                 }
                             } else {
                                 navigateToHome()
-                                Toast.makeText(this, "Вход через Google выполнен!", Toast.LENGTH_SHORT).show()
+                                //Toast.makeText(this, "Вход через Google выполнен!", Toast.LENGTH_SHORT).show()
                             }
                         } else {
                             Toast.makeText(this, "Ошибка: ${authTask.exception?.message}", Toast.LENGTH_SHORT).show()
@@ -341,7 +388,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private val downloadUrl = "https://firebasestorage.googleapis.com/v0/b/quqid-a8950.appspot.com/o/YomoCards%2Fyomucardsdb.db?alt=media&token=2482566d-3c4a-4abd-aa07-64d8b16d2bfb"
     private val fileName = "yomucardsdb.db"
-    private lateinit var databaseHelper: DatabaseHelper
+    lateinit var databaseHelper: DatabaseHelper
 
 
     @SuppressLint("ResourceType")
@@ -365,7 +412,11 @@ class HomeActivity : AppCompatActivity() {
                         Log.d("FirebaseValue", "Полученное значение: $value")
                         if(value != databaseHelper.getVersionDB()){
                             file.delete()
+                            databaseHelper.isDatabaseAvailable = false
                             downloadFile(downloadUrl, fileName)
+                        }
+                        else{
+                            databaseHelper.isDatabaseAvailable = true
                         }
                         // Здесь можно использовать значение, например:
                         // val version = value
@@ -380,6 +431,7 @@ class HomeActivity : AppCompatActivity() {
             })
         }
         else{
+            databaseHelper.isDatabaseAvailable = false
             downloadFile(downloadUrl, fileName)
         }
 
@@ -451,9 +503,10 @@ class HomeActivity : AppCompatActivity() {
                 }
 
                 if (result) {
-                    Toast.makeText(this@HomeActivity, "Загрузка завершена!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@HomeActivity, "Иероглифы загружены!", Toast.LENGTH_SHORT).show()
+                    databaseHelper.isDatabaseAvailable = true
                 } else {
-                    Toast.makeText(this@HomeActivity, "Ошибка загрузки.", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(this@HomeActivity, "Ошибка загрузки.", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 Toast.makeText(this@HomeActivity, "Ошибка: ${e.message}", Toast.LENGTH_LONG).show()
@@ -464,8 +517,7 @@ class HomeActivity : AppCompatActivity() {
 
     private fun downloadFileFromUrl(url: String, fileName: String): Boolean {
         try {
-            // Логирование URL
-            Log.d("Download", "Загружаю файл с URL: $url")
+
 
             val urlConnection = URL(url).openConnection() as HttpURLConnection
             urlConnection.requestMethod = "GET"

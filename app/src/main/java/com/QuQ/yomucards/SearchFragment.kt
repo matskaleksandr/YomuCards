@@ -349,6 +349,7 @@ class DatabaseHelper(context: Context, fileName: String) : SQLiteOpenHelper(
     context, null, null, DATABASE_VERSION
 ) {
     private val databasePath: String = File(context.filesDir, fileName).absolutePath
+    public var isDatabaseAvailable: Boolean = false
 
     override fun onCreate(db: SQLiteDatabase) {
         // База уже загружена, ничего не создаём

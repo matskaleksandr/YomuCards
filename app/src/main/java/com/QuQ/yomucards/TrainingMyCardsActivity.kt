@@ -2,6 +2,7 @@
 
     import android.os.Bundle
     import android.util.Log
+    import android.widget.ImageButton
     import android.widget.TextView
     import android.widget.Toast
     import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +10,8 @@
     import androidx.lifecycle.ViewModelProvider
     import androidx.viewpager2.widget.ViewPager2
     import com.QuQ.yomucards.databinding.ActivityTrainingBinding
+    import com.google.firebase.auth.FirebaseAuth
+    import com.google.firebase.database.FirebaseDatabase
 
     class TrainingMyCardsActivity : AppCompatActivity() {
         private lateinit var binding: ActivityTrainingBinding
@@ -22,7 +25,17 @@
 
             viewModel = ViewModelProvider(this).get(TrainingViewModel::class.java)
             setupObservers()
-            loadCards()
+            if(LessonState.id == 1){
+                LessonState.kana?.let { loadCardsLessons(it) }
+            }else{
+                loadCards()
+            }
+
+
+            val exitButton = findViewById<ImageButton>(R.id.btnExitTrainingMyCards)
+            exitButton.setOnClickListener{
+                finish()
+            }
         }
 
         private fun setupObservers() {
@@ -43,6 +56,11 @@
                 }
             }
         }
+
+        private fun loadCardsLessons(kana: List<Kana>) {
+            viewModel.generateQuestions(kana)
+        }
+
 
         private fun showQuestion(index: Int) {
             val questionsList = viewModel.questions.value
@@ -83,6 +101,23 @@
             updateProgress()
         }
 
+        fun saveLessonNumber(lessonNumber: Int) {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId != null) {
+                val database = FirebaseDatabase.getInstance()
+                val ref = database.getReference("Users/$userId/Stats_YomuCards/LessonNumber")
+
+                ref.setValue(lessonNumber)
+                    .addOnSuccessListener {
+                        println("Урок успешно сохранён: $lessonNumber")
+                    }
+                    .addOnFailureListener { e ->
+                        println("Ошибка при сохранении: ${e.message}")
+                    }
+            } else {
+                println("Ошибка: пользователь не авторизован")
+            }
+        }
 
         fun handleAnswer(isCorrect: Boolean) {
             viewModel.questions.value?.get(currentQuestionIndex)?.isAnsweredCorrectly = isCorrect
@@ -104,6 +139,9 @@
 
         private fun showResults() {
             val correct = viewModel.questions.value?.count { it.isAnsweredCorrectly } ?: 0
+            if(LessonState.id == 1){
+                saveLessonNumber(LessonState.LessonNumber)
+            }
             Toast.makeText(this, "Правильно: $correct/20", Toast.LENGTH_LONG).show()
             finish()
         }

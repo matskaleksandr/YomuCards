@@ -82,6 +82,9 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.transition:transition:1.4.1")
 
+    implementation("androidx.work:work-runtime:2.7.1")
+    implementation("androidx.core:core-ktx:1.7.0")
+
 
 
     implementation(libs.androidx.core.ktx)
