@@ -50,6 +50,7 @@ object LessonState {
     var id: Int = 0
     var kana: List<Kana>? = null
     var LessonNumber: Int = 0
+    var MaxLesson: Int = 0
 }
 
 object User {

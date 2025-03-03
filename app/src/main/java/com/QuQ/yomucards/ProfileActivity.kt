@@ -12,9 +12,15 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.ComponentActivity
+import com.QuQ.yomucards.LessonState.MaxLesson
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.GenericTypeIndicator
+import com.google.firebase.database.ValueEventListener
 
 class ProfileActivity : ComponentActivity(){
     private lateinit var auth: FirebaseAuth
@@ -57,9 +63,98 @@ class ProfileActivity : ComponentActivity(){
             finish()
         }
 
+        val textLessons: TextView = findViewById(R.id.tvLessonState)
+        getLessonNumber { lessonNumber ->
+            if (lessonNumber != null) {
+                textLessons.text = "Пройдено уроков: " + lessonNumber
+            } else {
+
+            }
+        }
+
+        val textKanaState: TextView = findViewById(R.id.tvKanaState)
+        getMyCardsCount { count ->
+            if (count != null) {
+                textKanaState.text = "Добавлено карточек: " + count
+            } else {
+
+            }
+        }
+
         imageView.setImageBitmap(User.imageProfile)
 
     }
+
+    fun getLessonNumber(callback: (Int?) -> Unit) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            val database = FirebaseDatabase.getInstance()
+            val ref = database.getReference("Users/$userId/Stats_YomuCards/LessonNumber")
+
+            ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val lessonNumber = snapshot.getValue(Int::class.java)
+                    callback(lessonNumber) // Передаём значение в callback
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    println("Ошибка чтения данных: ${error.message}")
+                    callback(null) // В случае ошибки возвращаем null
+                }
+            })
+        } else {
+            println("Ошибка: пользователь не авторизован")
+            callback(null)
+        }
+    }
+
+    fun getMyCardsCount(callback: (Int) -> Unit) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId == null) {
+            println("Ошибка: пользователь не авторизован")
+            callback(0)
+            return
+        }
+
+        val database = FirebaseDatabase.getInstance()
+        val paths = listOf(
+            "Users/$userId/Stats_YomuCards/Cards/Hiragana",
+            "Users/$userId/Stats_YomuCards/Cards/Katakana",
+            "Users/$userId/Stats_YomuCards/Cards/Kanji"
+        )
+
+        var totalCount = 0
+        var completedRequests = 0
+
+        for (path in paths) {
+            val ref = database.getReference(path)
+            ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        val count = snapshot.childrenCount.toInt() // Количество записей
+                        totalCount += count
+                    }
+
+                    completedRequests++
+                    if (completedRequests == paths.size) {
+                        callback(totalCount) // Возвращаем результат, когда все запросы завершены
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    println("Ошибка чтения данных: ${error.message}")
+                    completedRequests++
+                    if (completedRequests == paths.size) {
+                        callback(totalCount) // Если ошибка, всё равно возвращаем то, что есть
+                    }
+                }
+            })
+        }
+    }
+
+
+
+
 
     private fun signOutAndNavigateToMain() {
         // Выход из FirebaseAuth
@@ -110,6 +205,24 @@ class ProfileActivity : ComponentActivity(){
 
         val textEmail: TextView = findViewById(R.id.tvEmail)
         textEmail.text = User.email
+
+        val textLessons: TextView = findViewById(R.id.tvLessonState)
+        getLessonNumber { lessonNumber ->
+            if (lessonNumber != null) {
+                textLessons.text = "Пройдено уроков: " + lessonNumber
+            } else {
+
+            }
+        }
+
+        val textKanaState: TextView = findViewById(R.id.tvKanaState)
+        getMyCardsCount { count ->
+            if (count != null) {
+                textKanaState.text = "Добавлено карточек: " + count
+            } else {
+
+            }
+        }
 
     }
 }

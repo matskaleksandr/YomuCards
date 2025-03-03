@@ -58,6 +58,27 @@
             android:textSize="16sp"
             android:layout_marginTop="8dp"
             android:layout_gravity="center" />
+        <TextView
+            android:id="@+id/tvLessonState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="Пройдено уроков: "
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="50dp"
+            android:layout_gravity="left" />
+        <TextView
+            android:id="@+id/tvKanaState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="Добавлено карточек: "
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="left" />
+
 
         <!-- Пустое пространство, чтобы кнопка ушла вниз -->
         <View

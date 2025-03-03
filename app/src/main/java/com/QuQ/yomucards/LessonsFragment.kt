@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.QuQ.yomucards.LessonState.MaxLesson
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
@@ -63,6 +64,7 @@ class LessonsFragment : Fragment(R.layout.fragment_lessons) {
         getLessonNumber { lessonNumber ->
             if (lessonNumber != null) {
                 adapter.updateHighlightedLessons(lessonNumber)
+                MaxLesson = lessonNumber
             } else {
 
             }
@@ -105,6 +107,7 @@ class LessonsFragment : Fragment(R.layout.fragment_lessons) {
         getLessonNumber { lessonNumber ->
             if (lessonNumber != null) {
                 adapter.updateHighlightedLessons(lessonNumber)
+                MaxLesson = lessonNumber
             } else {
 
             }
@@ -236,7 +239,7 @@ class LessonsFragment : Fragment(R.layout.fragment_lessons) {
             val lessons = loadLessonsFromDB(requireContext())
 
             requireActivity().runOnUiThread {
-                Toast.makeText(requireContext(), "${lessons.size}", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(requireContext(), "${lessons.size}", Toast.LENGTH_SHORT).show()
                 adapter.updateData(lessons)
                 Log.d("Lesson", "${lessons[0].LessonID},${lessons[1].LessonID},${lessons[2].LessonID},${lessons[3].LessonID},${lessons[4].LessonID}")
             }

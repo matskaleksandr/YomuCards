@@ -139,7 +139,7 @@
 
         private fun showResults() {
             val correct = viewModel.questions.value?.count { it.isAnsweredCorrectly } ?: 0
-            if(LessonState.id == 1){
+            if(LessonState.id == 1 && LessonState.MaxLesson+1 == LessonState.LessonNumber){
                 saveLessonNumber(LessonState.LessonNumber)
             }
             Toast.makeText(this, "Правильно: $correct/20", Toast.LENGTH_LONG).show()
