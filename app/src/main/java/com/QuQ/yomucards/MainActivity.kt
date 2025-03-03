@@ -432,6 +432,7 @@ class HomeActivity : AppCompatActivity() {
             })
         }
         else{
+            databaseHelper = DatabaseHelper(applicationContext, fileName)
             databaseHelper.isDatabaseAvailable = false
             downloadFile(downloadUrl, fileName)
         }
