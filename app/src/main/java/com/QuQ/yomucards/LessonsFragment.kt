@@ -157,6 +157,12 @@ class LessonsFragment : Fragment(R.layout.fragment_lessons) {
                     true
                 }
 
+                R.id.nav_settings -> {
+                    val intent = Intent(context, SettingsActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+
                 else -> false
             }
         }

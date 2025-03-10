@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Существующий макет с элементами -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:theme="@style/Theme.YomuCards"
+        android:padding="16dp">
+
+        <!-- Изображение профиля -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivFriendProfilePicture"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:src="@drawable/yo"
+            app:shapeAppearanceOverlay="@style/CircleImageView"
+            app:strokeColor="@color/color1"
+            app:strokeWidth="2dp"
+            android:padding="2dp"
+            android:clipToPadding="false"
+            android:layout_marginTop="20dp" />
+
+        <!-- Имя пользователя -->
+        <TextView
+            android:id="@+id/tvFriendUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Имя друга"
+            android:textSize="35sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginTop="16dp"
+            android:layout_gravity="center" />
+
+        <!-- Email пользователя -->
+
+        <!-- Id пользователя -->
+        <TextView
+            android:id="@+id/tvFriendId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Id: 123456789123456789"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDellFriend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp"
+            android:text="Удалить из друзей" />
+
+        <TextView
+            android:id="@+id/tvFriendLessonState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="Пройдено уроков: "
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="30dp"
+            android:layout_gravity="left" />
+        <TextView
+            android:id="@+id/tvFriendKanaState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="Добавлено карточек: "
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="left" />
+
+
+        <!-- Пустое пространство, чтобы кнопка ушла вниз -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Кнопка для перехода в режим редактирования -->
+
+    </LinearLayout>
+
+
+    <ImageButton
+        android:id="@+id/btnExitFriendProfile"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/exit_arrow"
+        android:layout_gravity="top|start"
+        android:layout_margin="16dp" />
+</FrameLayout>

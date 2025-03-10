@@ -1,5 +1,6 @@
 package com.QuQ.yomucards
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -20,7 +21,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-
 
 
 class FriendsActivity : AppCompatActivity() {
@@ -185,6 +185,11 @@ class FriendsActivity : AppCompatActivity() {
         Toast.makeText(this, "Заявка отклонена", Toast.LENGTH_SHORT).show()
     }
 
+    override fun onStart() {
+        super.onStart()
+        loadFriends()
+    }
+
     private fun loadFriendRequests() {
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser == null) return
@@ -278,12 +283,14 @@ class FriendsActivity : AppCompatActivity() {
         val adapter = FriendsAdapter(
             friends,
             onProfileClick = { friend ->
-                // Логика перехода в профиль друга
-                Toast.makeText(this, "Переход в профиль ${friend.username}", Toast.LENGTH_SHORT).show()
+                val intent = FriendProfileActivity.createIntent(friendsRecyclerView.context, friend)
+                friendsRecyclerView.context.startActivity(intent)
             }
         )
         friendsRecyclerView.adapter = adapter
-        friendsRecyclerView.layoutManager = LinearLayoutManager(this)
+        friendsRecyclerView.layoutManager = LinearLayoutManager(friendsRecyclerView.context)
     }
+
+
 }
 

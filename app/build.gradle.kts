@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services")
     id("org.jetbrains.kotlin.plugin.compose") version "2.1.0"
+    id("kotlin-parcelize")
 }
 
 android {
@@ -13,8 +14,8 @@ android {
         applicationId = "com.QuQ.YomuCards"
         minSdk = 24
         targetSdk = 34
-        versionCode = 71
-        versionName = "0.7.1 alpha"
+        versionCode = 100
+        versionName = "0.1 beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -84,6 +85,8 @@ dependencies {
 
     implementation("androidx.work:work-runtime:2.7.1")
     implementation("androidx.core:core-ktx:1.7.0")
+
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0")
 
 
 

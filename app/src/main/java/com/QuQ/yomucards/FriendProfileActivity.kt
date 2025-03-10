@@ -13,6 +13,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import com.QuQ.yomucards.LessonState.MaxLesson
+import com.bumptech.glide.Glide
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -21,49 +22,59 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
-class ProfileActivity : ComponentActivity(){
+class FriendProfileActivity() : ComponentActivity(){
     private lateinit var auth: FirebaseAuth
+    private lateinit var friend: Friend
+
+    companion object {
+        private const val EXTRA_FRIEND = "extra_friend"
+
+        fun createIntent(context: Context, friend: Friend): Intent {
+            return Intent(context, FriendProfileActivity::class.java).apply {
+                putExtra(EXTRA_FRIEND, friend)
+            }
+        }
+    }
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_profile)
+        friend = intent.getParcelableExtra(EXTRA_FRIEND) ?: throw IllegalStateException("Friend is missing")
+        setContentView(R.layout.activity_friend_profile)
 
-        val imageView: ImageView = findViewById(R.id.ivProfilePicture)
-        imageView.setImageBitmap(User.imageProfile)
-        val bitmap = intent.getParcelableExtra<Bitmap>("image")
-        if (bitmap != null) {
-            imageView.setImageBitmap(bitmap)
-        }
+        val imageView: ImageView = findViewById(R.id.ivFriendProfilePicture)
+        Glide.with(imageView.context)
+            .load(friend.avatarPath)
+            .placeholder(R.drawable.ic_yo)
+            .error(R.drawable.ic_yo)
+            .into(imageView)
 
-        val textUsername: TextView = findViewById(R.id.tvUserName)
-        textUsername.text = User.name
+        val textUsername: TextView = findViewById(R.id.tvFriendUserName)
+        textUsername.text = friend.username
 
-        val textId: TextView = findViewById(R.id.tvId)
-        textId.text = "QID: " + User.id
+        val textId: TextView = findViewById(R.id.tvFriendId)
+        textId.text = "QID: " + friend.id
 
-        val textEmail: TextView = findViewById(R.id.tvEmail)
-        textEmail.text = User.email
-
-        auth = FirebaseAuth.getInstance()
-        val signOutButton = findViewById<Button>(R.id.btnOutAccount)
-        signOutButton.setOnClickListener {
-            signOutAndNavigateToMain()
-        }
-
-        val editButton = findViewById<Button>(R.id.btnEdit)
-        editButton.setOnClickListener{
-            val intent = Intent(this, EditProfileActivity::class.java)
-            startActivity(intent)
-        }
-
-        val exitButton = findViewById<ImageButton>(R.id.btnExitProfile)
+        val exitButton = findViewById<ImageButton>(R.id.btnExitFriendProfile)
         exitButton.setOnClickListener{
             finish()
         }
 
-        val textLessons: TextView = findViewById(R.id.tvLessonState)
+        val dellButton = findViewById<Button>(R.id.btnDellFriend)
+        dellButton.setOnClickListener{
+            val database = Firebase.database.reference
+            val friendRequestPath = "Users/${User.id}/friends/${friend.id}"
+            val friendRequestPath2 = "Users/${friend.id}/friends/${User.id}"
+            database.child(friendRequestPath).removeValue()
+            database.child(friendRequestPath2).removeValue()
+
+            finish()
+        }
+
+        val textLessons: TextView = findViewById(R.id.tvFriendLessonState)
         getLessonNumber { lessonNumber ->
             if (lessonNumber != null) {
                 textLessons.text = "Пройдено уроков: " + lessonNumber
@@ -72,7 +83,7 @@ class ProfileActivity : ComponentActivity(){
             }
         }
 
-        val textKanaState: TextView = findViewById(R.id.tvKanaState)
+        val textKanaState: TextView = findViewById(R.id.tvFriendKanaState)
         getMyCardsCount { count ->
             if (count != null) {
                 textKanaState.text = "Добавлено карточек: " + count
@@ -81,12 +92,10 @@ class ProfileActivity : ComponentActivity(){
             }
         }
 
-        imageView.setImageBitmap(User.imageProfile)
-
     }
 
     fun getLessonNumber(callback: (Int?) -> Unit) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        val userId = friend.id
         if (userId != null) {
             val database = FirebaseDatabase.getInstance()
             val ref = database.getReference("Users/$userId/Stats_YomuCards/LessonNumber")
@@ -109,7 +118,7 @@ class ProfileActivity : ComponentActivity(){
     }
 
     fun getMyCardsCount(callback: (Int) -> Unit) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        val userId = friend.id
         if (userId == null) {
             println("Ошибка: пользователь не авторизован")
             callback(0)
@@ -150,79 +159,5 @@ class ProfileActivity : ComponentActivity(){
                 }
             })
         }
-    }
-
-
-
-
-
-    private fun signOutAndNavigateToMain() {
-        // Выход из FirebaseAuth
-        auth.signOut()
-
-        // Выход из Google Sign-In
-        val googleSignInClient = GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN)
-        googleSignInClient.signOut().addOnCompleteListener {
-            // Удаление сохраненных данных входа
-            clearLoginInfo()
-
-            // Переход на MainActivity
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
-        }
-    }
-
-    private fun clearLoginInfo() {
-        val prefs = getSharedPreferences("loginPrefs", Context.MODE_PRIVATE)
-        prefs.edit().clear().apply()
-    }
-
-    @SuppressLint("SetTextI18n")
-    override fun onStart() {
-        super.onStart()
-
-        val imageView: ImageView = findViewById(R.id.ivProfilePicture)
-
-
-
-        // Получаем Bitmap из Intent
-        val bitmap = intent.getParcelableExtra<Bitmap>("image")
-        if (bitmap != null) {
-            imageView.setImageBitmap(bitmap)
-        }
-        Handler(Looper.getMainLooper()).postDelayed({
-            // Устанавливаем изображение в ImageView
-            imageView.setImageBitmap(User.imageProfile)
-        }, 3000) // 500 миллисекунд
-
-        val textUsername: TextView = findViewById(R.id.tvUserName)
-        textUsername.text = User.name
-
-        val textId: TextView = findViewById(R.id.tvId)
-        textId.text = "QID: " + User.id
-
-        val textEmail: TextView = findViewById(R.id.tvEmail)
-        textEmail.text = User.email
-
-        val textLessons: TextView = findViewById(R.id.tvLessonState)
-        getLessonNumber { lessonNumber ->
-            if (lessonNumber != null) {
-                textLessons.text = "Пройдено уроков: " + lessonNumber
-            } else {
-                textLessons.text = "Пройдено уроков: " + 0
-            }
-        }
-
-        val textKanaState: TextView = findViewById(R.id.tvKanaState)
-        getMyCardsCount { count ->
-            if (count != null) {
-                textKanaState.text = "Добавлено карточек: " + count
-            } else {
-                textKanaState.text = "Добавлено карточек: " + 0
-            }
-        }
-
     }
 }

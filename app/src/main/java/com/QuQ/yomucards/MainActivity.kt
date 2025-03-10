@@ -44,6 +44,9 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.util.concurrent.TimeUnit
 import android.Manifest
+import androidx.activity.OnBackPressedCallback
+import androidx.work.WorkInfo
+import java.util.concurrent.Executors
 
 
 object LessonState {
@@ -161,13 +164,26 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun scheduleDailyNotification() {
-        val dailyWorkRequest = PeriodicWorkRequest.Builder(
-            NotificationWorker::class.java,
-            1, TimeUnit.DAYS
-        ).build()
+        val workManager = WorkManager.getInstance(this)
+        val workQuery = workManager.getWorkInfosByTag("daily_notification")
 
-        WorkManager.getInstance(this).enqueue(dailyWorkRequest)
+        workQuery.addListener({
+            val existingWork = workQuery.get().find { it.state == WorkInfo.State.ENQUEUED }
+            if (existingWork == null) {
+                val dailyWorkRequest = PeriodicWorkRequest.Builder(
+                    NotificationWorker::class.java,
+                    1, TimeUnit.DAYS
+                )
+                    .setInitialDelay(1, TimeUnit.HOURS) // Чтобы не запускалось сразу
+                    .addTag("daily_notification")
+                    .build()
+
+                workManager.enqueue(dailyWorkRequest)
+            }
+        }, Executors.newSingleThreadExecutor())
     }
+
+
 
     override fun onStart() {
         super.onStart()
@@ -396,6 +412,12 @@ class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // Игнорируем кнопку "Назад"
+            }
+        })
 
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
 
