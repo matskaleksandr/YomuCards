@@ -1,11 +1,15 @@
 package com.QuQ.yomucards
 
+import android.R
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.QuQ.yomucards.databinding.FragmentSymbolToTranscriptionBinding
@@ -57,14 +61,34 @@ class SymbolToTranscriptionFragment(
         binding.symbolText.text = question.items.firstOrNull()?.first ?: ""
         binding.optionsRadioGroup.removeAllViews()
 
-        question.options.shuffled().forEach { option ->
+        question.options.shuffled().forEachIndexed { index, option ->
+            val marginValue = 190
             val radioButton = RadioButton(requireContext()).apply {
                 text = option
                 tag = option
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 40f)
+                buttonTintList = ColorStateList(
+                    arrayOf(
+                        intArrayOf(R.attr.state_checked),
+                        intArrayOf(-R.attr.state_checked)
+                    ),
+                    intArrayOf(
+                        0xFFB00020.toInt(), // фиолетовый для выбранного
+                        0xFFAAAAAA.toInt()  // серый по умолчанию
+                    )
+                )
+                gravity = Gravity.CENTER_VERTICAL
+                layoutParams = RadioGroup.LayoutParams(
+                    RadioGroup.LayoutParams.WRAP_CONTENT,
+                    RadioGroup.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    // Добавляем margin справа для всех, кроме последнего
+                    rightMargin = if (index != question.options.size - 1) marginValue else 0
+                }
             }
             binding.optionsRadioGroup.addView(radioButton)
         }
+
     }
 
     private fun setupListeners() {

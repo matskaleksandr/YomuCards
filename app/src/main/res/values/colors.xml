@@ -22,7 +22,7 @@
     <!-- Цвета для EditText -->
     <color name="edittext_bg_color">#000000</color> <!-- Светлый серый для фона в EditText -->
 
-
+    <color name="selected_item">#B00020</color>
 
     <color name="color1">#FF0000</color> <!-- Красный -->
     <color name="color2">#00FF00</color> <!-- Зеленый -->
