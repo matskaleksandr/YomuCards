@@ -1,5 +1,6 @@
     package com.QuQ.yomucards
 
+    import android.content.ContentValues.TAG
     import android.os.Bundle
     import android.util.Log
     import android.widget.ImageButton
@@ -102,20 +103,26 @@
         }
 
         fun saveLessonNumber(lessonNumber: Int) {
+            val TAG = "SaveLessonNumber"
             val userId = FirebaseAuth.getInstance().currentUser?.uid
+
             if (userId != null) {
+                Log.d(TAG, "Пользователь авторизован: $userId")
+
                 val database = FirebaseDatabase.getInstance()
                 val ref = database.getReference("Users/$userId/Stats_YomuCards/LessonNumber")
 
+                Log.d(TAG, "Попытка сохранить значение $lessonNumber по пути Users/$userId/Stats_YomuCards/LessonNumber")
+
                 ref.setValue(lessonNumber)
                     .addOnSuccessListener {
-                        println("Урок успешно сохранён: $lessonNumber")
+                        Log.d(TAG, "Урок успешно сохранён: $lessonNumber")
                     }
                     .addOnFailureListener { e ->
-                        println("Ошибка при сохранении: ${e.message}")
+                        Log.e(TAG, "Ошибка при сохранении: ${e.message}", e)
                     }
             } else {
-                println("Ошибка: пользователь не авторизован")
+                Log.e(TAG, "Ошибка: пользователь не авторизован")
             }
         }
 
@@ -139,10 +146,26 @@
 
         private fun showResults() {
             val correct = viewModel.questions.value?.count { it.isAnsweredCorrectly } ?: 0
-            if(LessonState.id == 1 && LessonState.MaxLesson+1 == LessonState.LessonNumber){
-                saveLessonNumber(LessonState.LessonNumber)
+
+            Log.d("SaveLessonNumber", "Результаты теста: $correct/20")
+
+            Log.d("SaveLessonNumber", "LessonState.id = ${LessonState.id}")
+            Log.d("SaveLessonNumber", "LessonState.MaxLesson = ${LessonState.MaxLesson}")
+            Log.d("SaveLessonNumber", "LessonState.LessonNumber = ${LessonState.LessonNumber}")
+
+            if (FirebaseAuth.getInstance().currentUser == null) {
+                Log.e("SaveLessonNumber", "Ошибка: пользователь не авторизован")
             }
+
+            if (LessonState.id == 1 && LessonState.MaxLesson + 1 == LessonState.LessonNumber) {
+                Log.d("SaveLessonNumber", "Условие выполнено: сохраняем номер урока ${LessonState.LessonNumber}")
+                saveLessonNumber(LessonState.LessonNumber)
+            } else {
+                Log.d("SaveLessonNumber", "Условие не выполнено: сохранение номера урока не требуется")
+            }
+
             Toast.makeText(this, "Правильно: $correct/20", Toast.LENGTH_LONG).show()
             finish()
         }
+
     }

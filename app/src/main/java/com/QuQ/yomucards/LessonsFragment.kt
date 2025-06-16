@@ -57,6 +57,15 @@ class LessonsFragment : Fragment(R.layout.fragment_lessons) {
         // Обновляем TextView с именем пользователя
         view?.findViewById<TextView>(R.id.textViewName)?.text = User.name ?: "Unknown"
         view?.findViewById<ImageView>(R.id.imageView)?.setImageBitmap(User.imageProfile)
+
+        getLessonNumber { lessonNumber ->
+            if (lessonNumber != null) {
+                adapter.updateHighlightedLessons(lessonNumber)
+                MaxLesson = lessonNumber
+            } else {
+                MaxLesson = 0
+            }
+        }
     }
 
     override fun onResume() {
@@ -66,7 +75,7 @@ class LessonsFragment : Fragment(R.layout.fragment_lessons) {
                 adapter.updateHighlightedLessons(lessonNumber)
                 MaxLesson = lessonNumber
             } else {
-
+                MaxLesson = 0
             }
         }
     }
@@ -86,7 +95,7 @@ class LessonsFragment : Fragment(R.layout.fragment_lessons) {
 
                 override fun onCancelled(error: DatabaseError) {
                     println("Ошибка чтения данных: ${error.message}")
-                    callback(null) // В случае ошибки возвращаем null
+                    callback(0) // В случае ошибки возвращаем null
                 }
             })
         } else {
@@ -109,7 +118,7 @@ class LessonsFragment : Fragment(R.layout.fragment_lessons) {
                 adapter.updateHighlightedLessons(lessonNumber)
                 MaxLesson = lessonNumber
             } else {
-
+                MaxLesson = 0
             }
         }
 
