@@ -1,88 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rootFrame"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@color/background_color"
-    android:gravity="center">
+    android:layout_height="match_parent">
 
-    <!-- Заголовок -->
+    <!-- Основная форма -->
+    <LinearLayout
+        android:id="@+id/formLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@color/background_color"
+        android:gravity="center">
 
-    <!-- Поле ввода email -->
+        <!-- Поле ввода email -->
+        <TextView
+            android:id="@+id/headerText"
+            android:layout_width="wrap_content"
+            android:layout_height="188dp"
+            android:layout_marginBottom="20dp"
+            android:text="YomuCards"
+            android:textAlignment="center"
+            android:textColor="@color/primary_text_color"
+            android:textSize="60sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/emailEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/email"
+            android:inputType="textEmailAddress"
+            android:layout_marginBottom="16dp"
+            android:padding="12dp"
+            android:background="@drawable/edittext_bg"
+            android:textColor="@color/text_color"
+            android:textSize="16sp"
+            android:minHeight="48dp" />
+
+        <!-- Поле ввода пароля -->
+        <EditText
+            android:id="@+id/passwordEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Пароль"
+            android:inputType="textPassword"
+            android:layout_marginBottom="20dp"
+            android:padding="12dp"
+            android:background="@drawable/edittext_bg"
+            android:textColor="@color/text_color"
+            android:textSize="16sp"
+            android:minHeight="48dp" />
+
+        <!-- Кнопка для регистрации -->
+        <Button
+            android:id="@+id/registerButton"
+            android:layout_width="281dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_button"
+            android:text="Зарегистрироваться"
+            android:textColor="@color/text_color"
+            android:textSize="16sp" />
+
+        <!-- Кнопка для входа -->
+        <Button
+            android:id="@+id/signInButton"
+            android:layout_width="283dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_button"
+            android:text="Войти"
+            android:textColor="@color/text_color"
+            android:textSize="16sp" />
+
+        <!-- Кнопка для входа через Google -->
+        <Button
+            android:id="@+id/googleSignInButton"
+            android:layout_width="283dp"
+            android:layout_height="48dp"
+            android:background="@drawable/rounded_button_google"
+            android:drawablePadding="-80dp"
+            android:drawableStart="@drawable/ic_google_scaled"
+            android:paddingStart="40dp"
+            android:text="Вход Google"
+            android:textColor="@color/text_color"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
     <TextView
-        android:id="@+id/headerText"
+        android:id="@+id/versionText"
         android:layout_width="wrap_content"
-        android:layout_height="188dp"
-        android:layout_marginBottom="20dp"
-        android:text="YomuCards"
-        android:textAlignment="center"
-        android:textColor="@color/primary_text_color"
-        android:textSize="60sp"
-        android:textStyle="bold" />
-
-    <EditText
-        android:id="@+id/emailEditText"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/email"
-        android:inputType="textEmailAddress"
-        android:layout_marginBottom="16dp"
-        android:padding="12dp"
-        android:background="@drawable/edittext_bg"
-        android:textColor="@color/text_color"
+        android:text="v1.1beta"
+        android:textColor="@color/black"
         android:textSize="16sp"
-        android:minHeight="48dp" />
-
-    <!-- Поле ввода пароля -->
-    <EditText
-        android:id="@+id/passwordEditText"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="8dp" />
+    <!-- Загрузочная маска - ИСПРАВЛЕННЫЙ ВАРИАНТ -->
+    <FrameLayout
+        android:id="@+id/loadingOverlay"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Пароль"
-        android:inputType="textPassword"
-        android:layout_marginBottom="20dp"
-        android:padding="12dp"
-        android:background="@drawable/edittext_bg"
-        android:textColor="@color/text_color"
-        android:textSize="16sp"
-        android:minHeight="48dp" />
+        android:layout_height="match_parent"
+        android:background="#FFFFFFFF"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center">
 
-    <!-- Кнопка для регистрации -->
-    <Button
-        android:id="@+id/registerButton"
-        android:layout_width="281dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        <!-- Контейнер для центрирования группы элементов -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_gravity="center">
 
-        android:background="@drawable/rounded_button"
-        android:text="Зарегистрироваться"
-        android:textColor="@color/text_color"
-        android:textSize="16sp" />
+            <!-- Прогресс-бар с лого внутри -->
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-    <!-- Кнопка для входа -->
-    <Button
-        android:id="@+id/signInButton"
-        android:layout_width="283dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/rounded_button"
-        android:text="Войти"
-        android:textColor="@color/text_color"
-        android:textSize="16sp" />
+                <ProgressBar
+                    android:id="@+id/loadingSpinner"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:indeterminate="true"
+                    android:indeterminateTint = "#000000"/>
 
-    <!-- Кнопка для входа через Google -->
-    <Button
-        android:id="@+id/googleSignInButton"
-        android:layout_width="283dp"
-        android:layout_height="48dp"
-        android:background="@drawable/rounded_button_google"
-        android:drawablePadding="-80dp"
-        android:drawableStart="@drawable/ic_google_scaled"
-        android:paddingStart="40dp"
-        android:text="Вход Google"
-        android:textColor="@color/text_color"
-        android:textSize="16sp" />
+                <ImageView
+                    android:id="@+id/centerLogo"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/ic_yo"
+                    android:layout_gravity="center"
+                    android:background="@android:color/transparent"
+                    android:scaleType="centerInside" />
 
-</LinearLayout>
+            </FrameLayout>
+
+            <!-- Текст загрузки (опционально) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Загрузка..."
+                android:textColor="@color/black"
+                android:layout_marginTop="16dp"
+                android:textSize="16sp"/>
+
+        </LinearLayout>
+    </FrameLayout>
+</FrameLayout>

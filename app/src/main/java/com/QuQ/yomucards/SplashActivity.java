@@ -31,7 +31,9 @@ public class SplashActivity extends AppCompatActivity {
                 // Переход на главную активность
                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(intent);
+                overridePendingTransition(0, 0);
                 finish();  // Закрыть SplashActivity, чтобы не вернуться назад
+                overridePendingTransition(0, 0);
             }
         }, 1000);  // 2 секунды задержки
     }

@@ -44,6 +44,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.util.concurrent.TimeUnit
 import android.Manifest
+import android.view.View
+import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.work.WorkInfo
 import java.util.concurrent.Executors
@@ -104,7 +106,6 @@ class MainActivity : ComponentActivity() {
         spannableString.setSpan(ForegroundColorSpan(ContextCompat.getColor(this, R.color.color8)), 6, 7, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)  // 7-я буква
         spannableString.setSpan(ForegroundColorSpan(ContextCompat.getColor(this, R.color.color8)), 7, 8, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)  // 8-я буква
         spannableString.setSpan(ForegroundColorSpan(ContextCompat.getColor(this, R.color.color8)), 8, 9, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)  // 9-я буква
-        // ... задаём остальные цвета букв по аналогии ...
         headerText.text = spannableString
 
         // Инициализация FirebaseAuth
@@ -133,6 +134,7 @@ class MainActivity : ComponentActivity() {
 
         // Обработчик кнопки входа через Google
         googleSignInButton.setOnClickListener {
+
             signInWithGoogle()
         }
     }
@@ -191,6 +193,8 @@ class MainActivity : ComponentActivity() {
         val prefs = getSharedPreferences("loginPrefs", Context.MODE_PRIVATE)
         val loginType = prefs.getString("loginType", null)
         if (loginType != null) {
+            val loadingOverlay = findViewById<FrameLayout>(R.id.loadingOverlay)
+            loadingOverlay.visibility = View.VISIBLE  // Показать
             // Чтобы выполнить повторный вход, сначала выходим
             auth.signOut()
             when (loginType) {
@@ -271,7 +275,8 @@ class MainActivity : ComponentActivity() {
 
     private fun signInUser(email: String, password: String) {
         if (email.isEmpty() || password.isEmpty()) return
-
+        val loadingOverlay = findViewById<FrameLayout>(R.id.loadingOverlay)
+        loadingOverlay.visibility = View.VISIBLE
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
@@ -288,15 +293,19 @@ class MainActivity : ComponentActivity() {
                                 navigateToHome()
                                 //Toast.makeText(this, "Вход выполнен!", Toast.LENGTH_SHORT).show()
                             } else {
+                                loadingOverlay.visibility = View.GONE
                                 Toast.makeText(this, "Ошибка: данные пользователя не найдены", Toast.LENGTH_SHORT).show()
                             }
                         }.addOnFailureListener {
+                            loadingOverlay.visibility = View.GONE
                             Toast.makeText(this, "Ошибка загрузки данных", Toast.LENGTH_SHORT).show()
                         }
                     } else {
+                        loadingOverlay.visibility = View.GONE
                         Toast.makeText(this, "Ошибка: не найден UID", Toast.LENGTH_SHORT).show()
                     }
                 } else {
+                    loadingOverlay.visibility = View.GONE
                     Toast.makeText(this, "Ошибка: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -310,6 +319,8 @@ class MainActivity : ComponentActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RC_SIGN_IN) {
+            val loadingOverlay = findViewById<FrameLayout>(R.id.loadingOverlay)
+            loadingOverlay.visibility = View.VISIBLE
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             val account = task.result
             account?.let {
@@ -365,6 +376,7 @@ class MainActivity : ComponentActivity() {
                                                     navigateToHome()
                                                     //Toast.makeText(this, "Вход через Google выполнен!", Toast.LENGTH_SHORT).show()
                                                 } else {
+                                                    loadingOverlay.visibility = View.GONE
                                                     Toast.makeText(this, "Ошибка при записи данных: ${dbTask.exception?.message}", Toast.LENGTH_SHORT).show()
                                                 }
                                             }
@@ -374,6 +386,7 @@ class MainActivity : ComponentActivity() {
                                         //Toast.makeText(this, "Вход через Google выполнен!", Toast.LENGTH_SHORT).show()
                                     }
                                 }.addOnFailureListener { error ->
+                                    loadingOverlay.visibility = View.GONE
                                     Toast.makeText(this, "Ошибка при чтении данных: ${error.message}", Toast.LENGTH_SHORT).show()
                                 }
                             } else {
@@ -381,6 +394,7 @@ class MainActivity : ComponentActivity() {
                                 //Toast.makeText(this, "Вход через Google выполнен!", Toast.LENGTH_SHORT).show()
                             }
                         } else {
+                            loadingOverlay.visibility = View.GONE
                             Toast.makeText(this, "Ошибка: ${authTask.exception?.message}", Toast.LENGTH_SHORT).show()
                         }
                     }
@@ -393,7 +407,9 @@ class MainActivity : ComponentActivity() {
     private fun navigateToHome() {
         val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)
+        overridePendingTransition(0, 0) // отключаем анимацию
         finish()
+        overridePendingTransition(0, 0) // отключаем анимацию
     }
 }
 
@@ -503,7 +519,9 @@ class HomeActivity : AppCompatActivity() {
             val googleSignInClient = GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN)
             googleSignInClient.signOut().addOnCompleteListener {
                 finish()
+                overridePendingTransition(0, 0) // отключаем анимацию
                 startActivity(Intent(this, MainActivity::class.java))
+                overridePendingTransition(0, 0) // отключаем анимацию
             }
         }
     }
