@@ -4,7 +4,7 @@
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
+    <color name="teal_700">#8C8C8C</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
@@ -12,19 +12,18 @@
     <!-- Основные цвета -->
     <color name="primary_color">#6200EE</color> <!-- Синий цвет для кнопок и других элементов -->
     <color name="primary_text_color">#000000</color> <!-- Черный цвет для текста -->
-    <color name="secondary_text_color">#757575</color> <!-- Серый цвет для второстепенного текста -->
+    <color name="secondary_text_color">#A2A2A2</color> <!-- Серый цвет для второстепенного текста -->
     <color name="background_color">#F5F5F5</color> <!-- Светлый фон -->
     <color name="text_color">#000000</color> <!-- Светлый фон -->
-
     <!-- Цвета для Google кнопки -->
     <color name="google_signin_color">#4285F4</color> <!-- Цвет Google SignIn -->
 
     <!-- Цвета для EditText -->
     <color name="edittext_bg_color">#000000</color> <!-- Светлый серый для фона в EditText -->
 
-    <color name="selected_item">#B00020</color>
+    <color name="selected_item">#B61E15</color>
 
-    <color name="color1">#FF0000</color> <!-- Красный -->
+    <color name="color1">#B61E15</color> <!-- Красный -->
     <color name="color2">#00FF00</color> <!-- Зеленый -->
     <color name="color3">#0000FF</color> <!-- Синий -->
     <color name="color4">#FFFF00</color> <!-- Желтый -->
@@ -44,6 +43,6 @@
     <color name="background">#F5F5F5</color>
 
 
-    <color name="red">#B00020</color>
+    <color name="red">#B61E15</color>
     <color name="red2">#E45281</color>
 </resources>

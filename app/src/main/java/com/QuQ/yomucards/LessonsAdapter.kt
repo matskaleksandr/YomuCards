@@ -1,11 +1,7 @@
 package com.QuQ.yomucards
-
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,6 +37,8 @@ class LessonsAdapter(
             button.text = "${lesson.LessonID}"
 
 
+
+
             if (isHighlighted) {
                 button.setTextColor(ColorStateList.valueOf(Color.parseColor("#04480B")) )
                 button.setTypeface(null, Typeface.BOLD)
@@ -51,15 +49,19 @@ class LessonsAdapter(
             else if (isHighlightedNext) {
                 button.setTextColor(Color.WHITE)
                 button.setTypeface(null, Typeface.BOLD)
+                button.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#B61E15")) // Красный цвет
                 button.setTextSize(30f)
                 button.isEnabled = true
             }
             else{
                 button.setTextSize(30f)
                 button.setTextColor(Color.WHITE)
+                button.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#E5E5E5")) // Серый цвет
                 button.setTypeface(null, Typeface.NORMAL)
                 button.isEnabled = false
             }
+
+
             button.setOnClickListener { openLesson(lesson) }
         }
     }
