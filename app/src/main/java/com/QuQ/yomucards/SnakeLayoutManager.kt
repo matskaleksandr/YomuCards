@@ -44,6 +44,8 @@ class SnakeLayoutManager : RecyclerView.LayoutManager() {
             val view = recycler.getViewForPosition(i)
             addView(view)
             var fPic = false
+            var fPic2 = false
+            var fPic1 = false
 
             // Измеряем View перед размещением
             measureChildWithMargins(view, 0, 0)
@@ -79,10 +81,13 @@ class SnakeLayoutManager : RecyclerView.LayoutManager() {
                 fPic = true
                 val sc = s % 2
                 if(sc == 1){
-                    offsetX = centerX - indent + columnCenterOffset
+                    offsetX = centerX - indent + columnCenterOffset + 100
+                    offsetY -= 250 // Добавляем отступ вниз
+                    fPic2 = true
                 } else{
-                    offsetX = centerX + indent + columnCenterOffset
-                    offsetY -= itemHeight + verticalSpacing  // Добавляем отступ вниз
+                    offsetX = centerX + indent + columnCenterOffset - 100
+                    offsetY -= itemHeight + verticalSpacing - 200 // Добавляем отступ вниз
+                    fPic1 = true
                 }
             }
 
@@ -90,6 +95,15 @@ class SnakeLayoutManager : RecyclerView.LayoutManager() {
 
 
             layoutDecorated(view, offsetX, offsetY - verticalOffset, offsetX + itemWidth, offsetY - verticalOffset + itemHeight)
+
+            if(fPic1){
+                offsetY -= 200
+                fPic1 = false
+            }
+            if(fPic2){
+                offsetY += 250
+                fPic1 = false
+            }
 
             if(!fPic)
                 offsetY += itemHeight + verticalSpacing  // Добавляем отступ вниз
