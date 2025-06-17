@@ -172,6 +172,12 @@ class LessonsFragment : Fragment(R.layout.fragment_lessons) {
                     true
                 }
 
+                R.id.nav_note -> {
+                    val intent = Intent(context, NoteEditorActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+
                 else -> false
             }
         }

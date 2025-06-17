@@ -22,5 +22,12 @@
         <!-- Дополнительные параметры -->
         <item name="android:statusBarColor">#B61E15</item> <!-- Цвет строки состояния -->
         <item name="android:navigationBarColor">#2C2C2C</item> <!-- Цвет нижней навигационной панели -->
+
+        <!-- Обязательные для Material Components -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.MaterialComponents.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.MaterialComponents.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.MaterialComponents.LargeComponent</item>
+
+
     </style>
 </resources>
