@@ -230,6 +230,7 @@ class LessonsFragment : Fragment(R.layout.fragment_lessons) {
 
     private fun setupRecyclerView() {
         recyclerView.layoutManager = SnakeLayoutManager()
+        (recyclerView.layoutManager as SnakeLayoutManager).s = 0
         adapter = LessonsAdapter(emptyList(),parentFragmentManager)
         recyclerView.adapter = adapter
     }
