@@ -45,7 +45,8 @@
         android:scrollbars="vertical"
         android:gravity="top|start"
         android:scrollHorizontally="false"
-        android:background="@android:color/transparent" /> <!-- Запрещает горизонтальную прокрутку -->
+        android:padding="16dp"
+        android:background="@drawable/edittext_background" /> <!-- Запрещает горизонтальную прокрутку -->
 
     <!-- Кнопка для перевода -->
     <Button
@@ -53,6 +54,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:text="Перевести" />
 
     <!-- Поле для вывода переведённого текста -->
@@ -61,8 +64,9 @@
         android:layout_width="match_parent"
         android:layout_height="184dp"
         android:ellipsize="end"
-        android:paddingTop="16dp"
+        android:padding="16dp"
         android:scrollbars="vertical"
+        android:background="@drawable/edittext_background"
         android:text="" />
 
     <!-- Добавленные кнопки "Копировать" и "Озвучить" -->

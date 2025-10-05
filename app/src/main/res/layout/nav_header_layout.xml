@@ -1,32 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="160dp"
+    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/black"
-    android:orientation="vertical"
-    android:paddingLeft="10dp">
+    android:orientation="vertical">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/imageView"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="20dp"
-        android:clipToPadding="false"
-        android:padding="2dp"
-        android:src="@drawable/ic_yo"
-        android:scaleType="centerCrop"
-        app:shapeAppearanceOverlay="@style/CircleImageView"
-        app:strokeColor="@color/color1"
-        app:strokeWidth="2dp" />
+    <!-- Верхняя часть с аватаром и именем -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:background="@color/black"
+        android:orientation="vertical"
+        android:paddingLeft="10dp">
 
-    <TextView
-        android:id="@+id/textViewName"
-        android:layout_width="wrap_content"
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imageView"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="20dp"
+            android:clipToPadding="false"
+            android:padding="2dp"
+            android:src="@drawable/ic_yo"
+            android:scaleType="centerCrop"
+            app:shapeAppearanceOverlay="@style/CircleImageView"
+            app:strokeColor="@color/color1"
+            app:strokeWidth="2dp" />
+
+        <TextView
+            android:id="@+id/textViewName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Имя пользователя"
+            android:textColor="@android:color/white"
+            android:textSize="25sp"
+            android:layout_marginTop="8dp" />
+
+    </LinearLayout>
+
+    <!-- Основная часть меню - здесь будут создаваться пункты меню -->
+    <LinearLayout
+        android:id="@+id/menu_items_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:background="@android:color/white">
+        <!-- Пункты меню будут добавляться сюда программно -->
+    </LinearLayout>
+
+    <!-- Нижняя часть с кнопками соцсетей - всегда в самом низу -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Имя пользователя"
-        android:textColor="@android:color/white"
-        android:textSize="25sp"
-        android:layout_marginTop="8dp" />
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:padding="1dp">
+
+        <!-- Горизонтальный контейнер для кнопок -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btnTelegram"
+                android:layout_width="49dp"
+                android:layout_height="49dp"
+                android:adjustViewBounds="true"
+                android:background="@null"
+                android:padding="0dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/tg" />
+
+            <ImageButton
+                android:id="@+id/btnDiscord"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:adjustViewBounds="true"
+                android:background="@null"
+                android:padding="0dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/discord" />
+
+            <ImageButton
+                android:id="@+id/btnVk"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:adjustViewBounds="true"
+                android:background="@null"
+                android:padding="0dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/vk" />
+
+            <ImageButton
+                android:id="@+id/btnYoutube"
+                android:layout_width="51dp"
+                android:layout_height="51dp"
+                android:adjustViewBounds="true"
+                android:background="@null"
+                android:padding="0dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/youtube_bt" />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

@@ -14,8 +14,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        app:cardElevation="4dp"
-        app:cardCornerRadius="8dp"
+        
+
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -25,14 +25,18 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="8dp"
-            android:gravity="center_vertical">
+            android:layout_marginTop="-10dp"
+            android:gravity="center_vertical"
+            android:background="@color/background_color">
 
             <ImageButton
                 android:id="@+id/btnExitNote"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="top|start"
-                android:layout_margin="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="1dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/exit_arrow" />
 
@@ -86,8 +90,8 @@
             <!-- Кнопка сохранения (теперь справа) -->
             <ImageButton
                 android:id="@+id/saveButton"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
@@ -111,7 +115,7 @@
             android:id="@+id/noteEditText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@null"
+            android:background="@drawable/edittext_background"
             android:gravity="start"
             android:hint="Введите текст..."
             android:inputType="textMultiLine"

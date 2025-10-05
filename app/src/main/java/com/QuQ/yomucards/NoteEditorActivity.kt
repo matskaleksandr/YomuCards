@@ -187,7 +187,6 @@ class NoteEditorActivity : AppCompatActivity() {
                 .setValue(json)
                 .addOnSuccessListener {
                     Snackbar.make(binding.root, "Заметка сохранена", Snackbar.LENGTH_SHORT).show()
-                    finish()
                 }
                 .addOnFailureListener { e ->
                     Snackbar.make(binding.root, "Ошибка сохранения: ${e.message}", Snackbar.LENGTH_LONG).show()

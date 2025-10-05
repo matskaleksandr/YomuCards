@@ -10,9 +10,14 @@
         android:icon="@drawable/friends_button_1" />
 
     <item
+        android:id="@+id/nav_top_learner"
+        android:title="Топ пользователей"
+        android:icon="@drawable/top_button" />
+
+    <item
         android:id="@+id/nav_note"
         android:title="Мои записи"
-        android:icon="@drawable/friends_button_1" />
+        android:icon="@drawable/note_button_1" />
 
     <item
         android:id="@+id/nav_cards"

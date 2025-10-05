@@ -64,6 +64,15 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".TopLearnerActivity"
+            android:exported="true"
+            android:theme="@style/Theme.YomuCards"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </activity>
+
         <activity android:name=".SettingsActivity"
             android:exported="true"
             android:theme="@style/Theme.YomuCards"
