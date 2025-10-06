@@ -19,7 +19,11 @@ class LessonsAdapter(
         R.drawable.lp1, R.drawable.lp2, R.drawable.lp3, R.drawable.lp4,
         R.drawable.lp5, R.drawable.lp6, R.drawable.lp7, R.drawable.lp8,
         R.drawable.lp9, R.drawable.lp10, R.drawable.lp11, R.drawable.lp12,
-        R.drawable.lp13, R.drawable.lp14, R.drawable.lp15, R.drawable.lp16
+        R.drawable.lp13, R.drawable.lp14, R.drawable.lp15, R.drawable.lp16,
+        R.drawable.lp17, R.drawable.lp18, R.drawable.lp19, R.drawable.lp20,
+        R.drawable.lp21, R.drawable.lp22, R.drawable.lp23, R.drawable.lp24,
+        R.drawable.lp25, R.drawable.lp26, R.drawable.lp27, R.drawable.lp28,
+        R.drawable.lp29, R.drawable.lp30, R.drawable.lp31, R.drawable.lp32
     )
 
     override fun getItemViewType(position: Int): Int {

@@ -54,25 +54,24 @@ class SymbolToTranslationFragment(
             val radioButton = RadioButton(requireContext()).apply {
                 text = option
                 tag = option
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 40f)
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 32f)
                 buttonTintList = ColorStateList(
                     arrayOf(
-                        intArrayOf(R.attr.state_checked),
-                        intArrayOf(-R.attr.state_checked)
+                        intArrayOf(android.R.attr.state_checked),
+                        intArrayOf(-android.R.attr.state_checked)
                     ),
                     intArrayOf(
-                        0xFFB00020.toInt(), // фиолетовый для выбранного
+                        0xFFB00020.toInt(), // цвет выбранного
                         0xFFAAAAAA.toInt()  // серый по умолчанию
                     )
                 )
-                gravity = Gravity.CENTER_VERTICAL
+                gravity = Gravity.START or Gravity.CENTER_VERTICAL // текст слева, кружок слева, выравнивание по вертикали
                 layoutParams = RadioGroup.LayoutParams(
+                    0, // ширина 0dp для веса
                     RadioGroup.LayoutParams.WRAP_CONTENT,
-                    RadioGroup.LayoutParams.WRAP_CONTENT
-                ).apply {
-                    // Добавляем margin справа для всех, кроме последнего
-                    rightMargin = if (index != question.options.size - 1) marginValue else 0
-                }
+                    1f // равная доля для каждого RadioButton
+                )
+                setPadding(0, 0, 0, 0) // убираем лишние паддинги
             }
             binding.optionsRadioGroup.addView(radioButton)
         }

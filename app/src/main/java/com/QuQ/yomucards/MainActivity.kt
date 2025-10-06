@@ -167,23 +167,35 @@ class MainActivity : ComponentActivity() {
 
     private fun scheduleDailyNotification() {
         val workManager = WorkManager.getInstance(this)
-        val workQuery = workManager.getWorkInfosByTag("daily_notification")
 
-        workQuery.addListener({
-            val existingWork = workQuery.get().find { it.state == WorkInfo.State.ENQUEUED }
-            if (existingWork == null) {
-                val dailyWorkRequest = PeriodicWorkRequest.Builder(
-                    NotificationWorker::class.java,
-                    1, TimeUnit.DAYS
-                )
-                    .setInitialDelay(1, TimeUnit.HOURS) // Чтобы не запускалось сразу
-                    .addTag("daily_notification")
-                    .build()
+        // Проверка через SharedPreferences
+        val prefs = getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
+        val notificationsEnabled = prefs.getBoolean("notifications_enabled", true)
 
-                workManager.enqueue(dailyWorkRequest)
-            }
-        }, Executors.newSingleThreadExecutor())
+        if (notificationsEnabled) {
+            val future = workManager.getWorkInfosByTag("daily_notification")
+            future.addListener({
+                val workInfos = future.get() // получаем список WorkInfo
+                val hasScheduledWork = workInfos.any { workInfo ->
+                    workInfo.state == WorkInfo.State.ENQUEUED
+                }
+
+                if (!hasScheduledWork) {
+                    val dailyWorkRequest = PeriodicWorkRequest.Builder(
+                        NotificationWorker::class.java,
+                        1, TimeUnit.DAYS
+                    )
+                        .setInitialDelay(1, TimeUnit.HOURS)
+                        .addTag("daily_notification")
+                        .build()
+
+                    workManager.enqueue(dailyWorkRequest)
+                    Log.d("Notifications", "Daily notification scheduled")
+                }
+            }, ContextCompat.getMainExecutor(this))
+        }
     }
+
 
 
 
