@@ -6,19 +6,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Контейнер для фрагментов -->
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="65dp"
-
         app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.515"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.169" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
+    <!-- Кнопки для тестирования -->
     <Button
         android:id="@+id/download"
         android:layout_width="wrap_content"
@@ -26,10 +25,10 @@
         android:text="test бд"
         android:padding="12dp"
         android:textSize="18sp"
-        app:layout_constraintTop_toTopOf="parent"
         android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <Button
         android:id="@+id/signOutButton"
@@ -41,8 +40,9 @@
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/download"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
@@ -53,8 +53,44 @@
         app:itemIconSize="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/bottom_nav_menu" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Overlay поверх всего, включая BottomNavigationView -->
+    <FrameLayout
+        android:id="@+id/welcomeOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true">
+
+    <LinearLayout
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/dialog_background"
+        android:orientation="vertical"
+        android:padding="10dp"
+        android:layout_gravity="center">
+
+        <TextView
+            android:id="@+id/welcomeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Добро пожаловать в YomuCards!\nНаше приложение поможет вам повторять и закреплять уже изученные японские иероглифы, а также служит удобным учебником и словарём. Здесь вы сможете практиковать чтение, узнавать транскрипцию и переводить текст прямо в приложении при помощи встроенного переводчика. Для ежедневной практики также есть виджет на рабочий стол, который показывает случайные иероглифы для быстрого повторения в любое время. \nСледите за обновлениями и новостями наших приложений в официальном Telegram канале"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"/>
+
+        <Button
+            android:id="@+id/welcomeOkButton"
+            android:layout_width="129dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:text="В путь!" />
+    </LinearLayout>
+</FrameLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>

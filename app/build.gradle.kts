@@ -13,8 +13,8 @@ android {
     defaultConfig {
         applicationId = "com.QuQ.YomuCards"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 120
+        targetSdk = 35
+        versionCode = 124
         versionName = "1.2 beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

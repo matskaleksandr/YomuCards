@@ -435,6 +435,33 @@ class HomeActivity : AppCompatActivity() {
     private val fileName = "yomucardsdb.db"
     lateinit var databaseHelper: DatabaseHelper
 
+    override fun onStart() {
+        super.onStart()
+
+        val prefs = getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
+        val firstLaunch = prefs.getBoolean("first_launch_home", true)
+
+        if (firstLaunch) {
+            findViewById<BottomNavigationView>(R.id.bottom_navigation).visibility = View.GONE
+            showWelcomeOverlay()
+
+            // Сохраняем, что окошко уже показывали
+            prefs.edit().putBoolean("first_launch_home", false).apply()
+        }
+    }
+
+
+    private fun showWelcomeOverlay() {
+        val overlay = findViewById<FrameLayout>(R.id.welcomeOverlay)
+        val okButton = findViewById<Button>(R.id.welcomeOkButton)
+
+        overlay.visibility = View.VISIBLE
+
+        okButton.setOnClickListener {
+            overlay.visibility = View.GONE
+            findViewById<BottomNavigationView>(R.id.bottom_navigation).visibility = View.VISIBLE
+        }
+    }
 
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
